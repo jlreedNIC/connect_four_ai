@@ -17,6 +17,9 @@ int main()
     App connect4app;
     connect4app.runApp();
 
+    std::cout << "window crashed?\n";
+    std::cout << "guess not.\n";
+
     // sf::RenderWindow window(sf::VideoMode(600, 600), "testing window");
 
     // while(window.isOpen())

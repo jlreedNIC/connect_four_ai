@@ -18,7 +18,9 @@ App::App() : window(sf::VideoMode(600,600), "Connect Four AI Test")
 
     cursorPos.x = 100.f;
     cursorPos.y = 50.f;
-    position = 0;
+    position = 0; // this is causing stack smashing, but I don't know why
+    // potential problem found of needing to update SFML
+    // maybe reinstall sfml?
     
     // std::cout << "tried cursor setting up\n";
 }
@@ -47,7 +49,7 @@ void App::runApp()
                     window.close();
                     break;
                 case sf::Event::KeyPressed:
-                    std::cout << "key pressed\n";
+                    // std::cout << "key pressed\n";
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
                     {
                         moveCursor(sf::Keyboard::Left);
