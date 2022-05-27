@@ -37,7 +37,7 @@ Connect4App::Connect4App()
     //          {0, 0, 0, 0, 0, 0, 0}};
 
 
-    start = 0;
+    start = 1;
 
 }
 
@@ -52,7 +52,7 @@ void Connect4App::startMenu()
     
     do
     {
-        std::cout << "Who will start?\n";
+        std::cout << "\nWho will start?\n";
         std::cout << " (1) Computer\n";
         std::cout << " (2) Player\n";
         std::cout << " (0) Exit\n";
@@ -61,15 +61,15 @@ void Connect4App::startMenu()
         switch(choice)
         {
             case '0':
-                std::cout << "Thanks for playing\n";
+                exitScreen();
                 break;
             case '1':
-                start = 0;
+                start = 1;
                 choice = '0';
                 std::cout << "Computer starts\n";
                 break;
             case '2':
-                start = 1;
+                start = -1;
                 choice = '0';
                 std::cout << "Player starts\n";
                 break;
@@ -85,22 +85,99 @@ void Connect4App::startMenu()
 void Connect4App::gameLoop()
 {
     char choice = '1';
-    printGameBoard();
-    std::cout << checkForWin() << "\n";
-    while(checkForWin() == 0 && choice != '0')
+
+    // printGameBoard();
+    // std::cout << checkForWin() << "\n";
+    while(checkForWin() == 0)
     {
         printGameBoard();
-        std::cout << "\n (1) Move left (2) Move right (0) Exit\n";
-        std::cin >> choice;
-        std::cout << "You entered " << choice << "\n";
 
-        if(choice == '1' && cursor > 0)
+        // player turn
+        // handled by start variable
+        if(start == -1)
         {
-            cursor--;
+            std::cout << "Player's turn\n";
+            std::cout << "\n (1) Move left (2) Move right (3) Place token (0) Exit\n";
+            std::cin >> choice;
+            std::cout << "You entered " << choice << "\n";
+
+            if(choice == '1' && cursor > 0)
+            {
+                cursor--;
+            }
+            if(choice == '2' && cursor < 6)
+                cursor++;
+            
+            if(choice == '3')
+            {
+                placeToken(start);
+                start = 1;
+                // std::cout << "placed\n";
+            }
+            
+            
         }
-        if(choice == '2' && cursor < 6)
-            cursor++;
+
+        // computer option
+        else if(start == 1)
+        {
+            std::cout << "Computer's turn\n";
+            std::cout << "\n (1) Move left (2) Move right (3) Place token (0) Exit\n";
+            std::cin >> choice;
+            std::cout << "You entered " << choice << "\n";
+
+            if(choice == '1' && cursor > 0)
+            {
+                cursor--;
+            }
+            if(choice == '2' && cursor < 6)
+                cursor++;
+            
+            if(choice == '3')
+            {
+                placeToken(start);
+                start = -1;
+                // std::cout << "placed\n";
+            }
+
+
+
+            // cursor = computer pick space
+            // placeToken(start);
+            // cursor = 3;
+            
+        }
+        if(choice == '0')
+            exitScreen();
+        
     }
+    if(checkForWin() != 0)
+        std::cout << "We have a winner!\n";
+    printGameBoard();
+}
+
+void Connect4App::placeToken(int player)
+{
+    int j = 0;
+    // place at end of column
+    for(j=0; j<6; j++)
+    {
+        if(board[j][cursor] != 0)
+        {
+            break;
+        }
+    }
+    j--;
+    if(j >= 0)
+    {
+        board[j][cursor] = player;
+    }
+}
+
+void Connect4App::exitScreen()
+{
+    std::cout << "Thanks for playing!\n";
+    exit(0);
 }
 
 void Connect4App::printGameBoard()
@@ -126,7 +203,6 @@ void Connect4App::printGameBoard()
 
 int Connect4App::checkForWin()
 {
-    int count = 0;
     int winStates[] = {-1, 1};
     int win = 0;
 
@@ -239,60 +315,3 @@ int Connect4App::diagWinCheck(int i, int j, int winstate)
         return 0;
     else return winstate;
 }
-
-// int Connect4App::checkHorizWin()
-// {
-//     int compWin = 0;
-//     int playerWin = 0;
-//     int win = 0;
-//     int i=0, j=0, k=0;
-
-//     for(j=0; j<6; j++)
-//     {
-//         for(i=0; i<7; i++)
-//         {
-//             if(board[j][i] == 1)
-//             {
-//                 // check next 3
-//                 for(k=i+1; k<i+4; k++)
-//                 {
-//                     win = 1;
-//                     if(k > 6 || board[j][k] != 1)
-//                     {
-//                         i = k;
-//                         win = 0;
-//                         break;
-//                     }
-//                 }
-//             }
-            
-//             if(board[j][i] == -1)
-//             {
-//                 for(k=i+1; k<i+4; k++)
-//                 {
-//                     win = -1;
-//                     if(k > 6 || board[j][k] != -1)
-//                     {
-//                         i = k;
-//                         win = 0;
-//                         break;
-//                     }
-//                 }
-//             }
-
-//             if(win != 0)
-//                 break;
-//         }
-
-//         if(win != 0)
-//             break;
-//     }
-
-//     if(win != 0)
-//     {
-//         std::cout << "We have a winnner." << i << j << k << win << "\n";
-//     }
-
-//     return win;
-
-// }

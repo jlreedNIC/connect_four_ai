@@ -20,6 +20,9 @@ class Connect4App
         int start;
 
         void printGameBoard();
+        void placeToken(int player);
+
+        void exitScreen();
 
         int checkForWin();
         int horizWinCheck(int i, int j, int winstate);
