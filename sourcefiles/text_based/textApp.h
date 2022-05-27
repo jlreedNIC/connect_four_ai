@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <string>
 
 class Connect4App
 {
@@ -15,6 +16,7 @@ class Connect4App
 
     private:
         int board[6][7]; // 1 for comp, -1 for player
+        int cursor;
         int start;
 
         void printGameBoard();

@@ -10,22 +10,24 @@ Connect4App::Connect4App()
             board[i][j] = 0;
         }
     }
-    board[0][0] = -1;
-    board[1][1] = 1;
-    board[2][2] = 1; 
-    board[3][3] = 1; 
-    board[0][5] = -1; 
-    board[0][6] = -1;
 
-    board[1][0] = 1;
-    board[1][1] = 1;
-    board[1][2] = -1;
-    board[1][3] = 1;
-    board[1][4] = 0;
-    board[1][5] = -1;
-    board[1][6] = -1; 
-    board[2][6] = -1;
-    board[3][6] = -1;
+    cursor = 3;
+    // board[0][0] = -1;
+    // board[1][1] = 1;
+    // board[2][2] = 1; 
+    // board[3][3] = 1; 
+    // board[0][5] = -1; 
+    // board[0][6] = -1;
+
+    // board[1][0] = 1;
+    // board[1][1] = 1;
+    // board[1][2] = -1;
+    // board[1][3] = 1;
+    // board[1][4] = 0;
+    // board[1][5] = -1;
+    // board[1][6] = -1; 
+    // board[2][6] = -1;
+    // board[3][6] = -1;
 
     // board = {{0, 1, 1, 1, -1, -1, -1},
     //          {1, 1, 1, 1, 0, -1, -1},
@@ -82,16 +84,33 @@ void Connect4App::startMenu()
 
 void Connect4App::gameLoop()
 {
+    char choice = '1';
     printGameBoard();
     std::cout << checkForWin() << "\n";
-    // while(checkForWin())
-    // {
-    //     printGameBoard();
-    // }
+    while(checkForWin() == 0 && choice != '0')
+    {
+        printGameBoard();
+        std::cout << "\n (1) Move left (2) Move right (0) Exit\n";
+        std::cin >> choice;
+        std::cout << "You entered " << choice << "\n";
+
+        if(choice == '1' && cursor > 0)
+        {
+            cursor--;
+        }
+        if(choice == '2' && cursor < 6)
+            cursor++;
+    }
 }
 
 void Connect4App::printGameBoard()
 {
+    std::string emptyspace = "   ";
+    for(int i=0; i<4*cursor; i++)
+        emptyspace += " ";
+
+    system("clear");
+    std::cout << emptyspace << "V\n";
     std::cout << " ----------------------------- \n";
     for(int i=0; i<6; i++)
     {
