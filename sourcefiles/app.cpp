@@ -21,6 +21,11 @@ App::App() : window(sf::VideoMode(600,600), "Connect Four AI Test")
     position = 0; // this is causing stack smashing, but I don't know why
     // potential problem found of needing to update SFML
     // maybe reinstall sfml?
+    whoStarts = 1;
+
+    for(int i=0; i<7; i++)
+        for(int j=0; j<6; j++)
+            boardNum[i][j] = 0;
     
     // std::cout << "tried cursor setting up\n";
 }
@@ -31,9 +36,34 @@ App::~App()
     std::cout << "app destructor called\n";
 }
 
+void App::startMenu()
+{
+    // while(window.isOpen())
+    // {
+    //     sf::Event event;
+
+    //     while(window.pollEvent(event))
+    //     {
+    //         if(event.type == sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+    //         {
+    //             std::cout << "Mouse button pushed\n";
+    //         }
+    //     }
+
+    //     drawStartMenu();
+    // }
+}
+
+// void App::drawStartMenu()
+// {
+//     sf::RectangleShape playerFirst(sf::Vector2f(50.f, 30.f));
+//     playerFirst.setFillColor(sf::Color::White);
+//     playerFirst.setOutlineColor(sf::Color::Black);
+// }
+
 void App::runApp()
 {
-    while(window.isOpen())
+    while(window.isOpen() && checkForWin() == 0)
     {
         sf::Event event;
 
@@ -58,6 +88,10 @@ void App::runApp()
                     {
                         moveCursor(sf::Keyboard::Right);
                     }
+                    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+                    {
+                        placeToken(1);
+                    }
                     break;
                 default:
                     break;
@@ -68,6 +102,13 @@ void App::runApp()
             //     std::cout << "closing window\n";
             //     window.close();
             // }
+        }
+
+        if(checkForWin() != 0)
+        {
+            // function for displaying winner
+            std::cout << "we have a winner!\n";
+            
         }
 
         window.clear(sf::Color::White);
@@ -103,7 +144,12 @@ void App::drawGameBoard()
         for(int j=0; j<6; j++)
         {
             boardHoles[i][j].setRadius(25.f);
-            boardHoles[i][j].setFillColor(sf::Color::White);
+            if(boardNum[i][j] == 0)
+                boardHoles[i][j].setFillColor(sf::Color::White);
+            else if(boardNum[i][j] == 1)
+                boardHoles[i][j].setFillColor(sf::Color::Green);
+            else boardHoles[i][j].setFillColor(sf::Color::Magenta);
+            // boardHoles[i][j].setFillColor(sf::Color::White);
             boardHoles[i][j].move(sf::Vector2f(i*70 + 65, j*80 + 100));
             window.draw(boardHoles[i][j]);
         }
@@ -145,4 +191,137 @@ void App::drawCursor()
 
     // cursor.move(moveVector);
     window.draw(cursor);
+}
+
+void App::placeToken(int player)
+{
+    int j = 0;
+    // place at end of column
+    for(j=0; j<6; j++)
+    {
+        if(boardNum[position][j] != 0)
+        {
+            break;
+        }
+    }
+    j--;
+    if(j >= 0)
+    {
+        boardNum[position][j] = player;
+    }
+}
+
+int App::checkForWin()
+{
+    int winStates[] = {-1, 1};
+    int win = 0;
+
+    for(int i=0; i<7; i++)
+    {
+        for(int j=0; j<6; j++)
+        {
+            for(int k=0; k<2; k++)
+            {
+                if(boardNum[i][j] == winStates[k])
+                {
+                    // std::cout << "Checking for win " << i << j << winStates[k] << "...\n";
+                    win = horizWinCheck(i,j,winStates[k]);
+                    if(win != 0)
+                        return win;
+                    win = vertWinCheck(i,j,winStates[k]);
+                    if(win != 0)
+                        return win;
+                    win = diagWinCheck(i,j,winStates[k]);
+                    if(win != 0)
+                        return win;
+                }
+            }
+        }
+    }
+    return win;
+}
+
+int App::horizWinCheck(int i, int j, int winstate)
+{
+    int count = 1;
+    int pi = i+1;
+    int ni = i-1;
+    int end=0, ex=0, ey=0;
+
+    do
+    {
+        if(pi < 6 && boardNum[pi][j] == winstate)
+            count++;
+        else ex = 1;
+
+        if(ni >= 0 && boardNum[ni][j] == winstate)
+            count++;
+        else ey = 1;
+
+        pi++;
+        ni--;
+        end = ex + ey;
+    }while(count < 4 && end < 2);
+
+    if(count < 4)
+        return 0;
+    else return winstate;
+}
+
+int App::vertWinCheck(int i, int j, int winstate)
+{
+    int count = 1;
+    int pj = j+1;
+    int nj = j-1;
+    int end=0, ex=0, ey=0;
+
+    do
+    {
+        if(pj < 7 && boardNum[i][pj] == winstate)
+            count++;
+        else ex = 1;
+
+        if(nj >= 0 && boardNum[i][nj] == winstate)
+            count++;
+        else ey = 1;
+
+        pj++;
+        nj--;
+        end = ex + ey;
+    }while(count < 4 && end < 2);
+
+    if(count < 4)
+        return 0;
+    else return winstate;
+}
+
+int App::diagWinCheck(int i, int j, int winstate)
+{
+    int count = 1;
+    int pj = j+1;
+    int pi = i+1;
+    int nj = j-1;
+    int ni = i-1;
+    int end=0, ex=0, ey=0;
+
+    do
+    {
+        if(pj < 7 && pi < 6 && boardNum[pi][pj] == winstate)
+            count++;
+        else ex = 1;
+
+        if(nj >= 0 && ni >= 0 && boardNum[ni][nj] == winstate)
+            count++;
+        else ey = 1;
+
+        pj++;
+        pi++;
+        nj--;
+        ni++;
+        end = ex + ey;
+    }while(count < 4 && end < 2);
+
+    if(count < 4)
+        return 0;
+    else return winstate;
 }
