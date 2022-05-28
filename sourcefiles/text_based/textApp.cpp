@@ -1,7 +1,7 @@
 #include "textApp.h"
 
 
-Connect4App::Connect4App()
+Connect4App::Connect4App() : gameAgent()
 {
     for(int i=0; i<6; i++)
     {
@@ -43,7 +43,7 @@ Connect4App::Connect4App()
 
 Connect4App::~Connect4App()
 {
-
+    std::cout << "game class stopped\n";
 }
 
 void Connect4App::startMenu()
@@ -88,7 +88,7 @@ void Connect4App::gameLoop()
 
     // printGameBoard();
     // std::cout << checkForWin() << "\n";
-    while(checkForWin() == 0)
+    while(checkForWin() == 0 && choice != '0')
     {
         printGameBoard();
 
@@ -177,7 +177,7 @@ void Connect4App::placeToken(int player)
 void Connect4App::exitScreen()
 {
     std::cout << "Thanks for playing!\n";
-    exit(0);
+    // exit(0);
 }
 
 void Connect4App::printGameBoard()
@@ -186,7 +186,7 @@ void Connect4App::printGameBoard()
     for(int i=0; i<4*cursor; i++)
         emptyspace += " ";
 
-    system("clear");
+    // system("clear");
     std::cout << emptyspace << "V\n";
     std::cout << " ----------------------------- \n";
     for(int i=0; i<6; i++)

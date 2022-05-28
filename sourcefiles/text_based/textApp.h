@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include "agent.h"
 
 class Connect4App
 {
@@ -28,6 +29,8 @@ class Connect4App
         int horizWinCheck(int i, int j, int winstate);
         int vertWinCheck(int i, int j, int winstate);
         int diagWinCheck(int i, int j, int winstate);
+
+        AgentConnect4 gameAgent;
 };
 
 
