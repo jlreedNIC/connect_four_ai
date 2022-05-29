@@ -16,9 +16,9 @@ $(obj)/%.o : %.cpp
 $(exec) : $(obj)/mainText.o $(obj)/textApp.o $(obj)/agent.o
 	$(gxx) $(flags) $^ -o $@ 
 
-$(obj)/mainText.o : $(obj)/textApp.o
+# $(obj)/mainText.o : $(obj)/textApp.o
 
-$(obj)/textApp.o : $(obj)/agent.o
+# $(obj)/textApp.o : $(obj)/agent.o
 
 test: $(exec)
 	./$(exec)
