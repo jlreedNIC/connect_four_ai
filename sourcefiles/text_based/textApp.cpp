@@ -121,24 +121,29 @@ void Connect4App::gameLoop()
         // computer option
         else if(start == 1)
         {
-            std::cout << "Computer's turn\n";
-            std::cout << "\n (1) Move left (2) Move right (3) Place token (0) Exit\n";
-            std::cin >> choice;
-            std::cout << "You entered " << choice << "\n";
+            // std::cout << "computer going\n";
+            // gameAgent.pickMove(board);
+            cursor = gameAgent.pickMove(board);
+            placeToken(1);
+            // std::cout << "Computer's turn\n";
+            // std::cout << "\n (1) Move left (2) Move right (3) Place token (0) Exit\n";
+            // std::cin >> choice;
+            // std::cout << "You entered " << choice << "\n";
 
-            if(choice == '1' && cursor > 0)
-            {
-                cursor--;
-            }
-            if(choice == '2' && cursor < 6)
-                cursor++;
+            // if(choice == '1' && cursor > 0)
+            // {
+            //     cursor--;
+            // }
+            // if(choice == '2' && cursor < 6)
+            //     cursor++;
             
-            if(choice == '3')
-            {
-                placeToken(start);
+            // if(choice == '3')
+            // {
+            //     placeToken(start);
                 start = -1;
-                // std::cout << "placed\n";
-            }
+                cursor = 3;
+            //     // std::cout << "placed\n";
+            // }
 
 
 
@@ -151,8 +156,9 @@ void Connect4App::gameLoop()
             exitScreen();
         
     }
-    if(checkForWin() != 0)
-        std::cout << "We have a winner!\n";
+    int winner = checkForWin();
+    if(winner != 0)
+        std::cout << "We have a winner! " << winner << "\n";
     printGameBoard();
 }
 
@@ -217,13 +223,22 @@ int Connect4App::checkForWin()
                     // std::cout << "Checking for win " << i << j << winStates[k] << "...\n";
                     win = horizWinCheck(i,j,winStates[k]);
                     if(win != 0)
+                    {
+                        // std::cout << "horizontal win!\n";
                         return win;
+                    }
                     win = vertWinCheck(i,j,winStates[k]);
                     if(win != 0)
+                    {
+                        // std::cout << "vertical win!\n";
                         return win;
+                    }
                     win = diagWinCheck(i,j,winStates[k]);
                     if(win != 0)
+                    {
+                        // std::cout << "diagonal win!\n";
                         return win;
+                    }
                 }
             }
         }
@@ -240,17 +255,19 @@ int Connect4App::horizWinCheck(int i, int j, int winstate)
 
     do
     {
-        if(pi < 7 && board[pi][j] == winstate)
+        if(pi < 6 && board[pi][j] == winstate && ex ==0)
             count++;
         else ex = 1;
 
-        if(ni >= 0 && board[ni][j] == winstate)
+        if(ni >= 0 && board[ni][j] == winstate && ey == 0)
             count++;
         else ey = 1;
 
         pi++;
         ni--;
         end = ex + ey;
+
+        // std::cout << count << "\n";
     }while(count < 4 && end < 2);
 
     if(count < 4)
@@ -267,11 +284,11 @@ int Connect4App::vertWinCheck(int i, int j, int winstate)
 
     do
     {
-        if(pj < 6 && board[i][pj] == winstate)
+        if(pj < 7 && board[i][pj] == winstate && ex ==0)
             count++;
         else ex = 1;
 
-        if(nj >= 0 && board[i][nj] == winstate)
+        if(nj >= 0 && board[i][nj] == winstate && ey ==0)
             count++;
         else ey = 1;
 
@@ -296,18 +313,21 @@ int Connect4App::diagWinCheck(int i, int j, int winstate)
 
     do
     {
-        if(pj < 6 && pi < 7 && board[pi][pj] == winstate)
+        if(pj < 7 && pi < 6 && board[pi][pj] == winstate && ex ==0)
             count++;
         else ex = 1;
 
-        if(nj >= 0 && ni >= 0 && board[ni][nj] == winstate)
+        if(nj >= 0 && ni >= 0 && board[ni][nj] == winstate && ey ==0)
+        {
+            // std::cout << board[ni][nj] << "board[" << ni << "][" << nj << "]\n";
             count++;
+        }
         else ey = 1;
 
         pj++;
         pi++;
         nj--;
-        ni++;
+        ni--;
         end = ex + ey;
     }while(count < 4 && end < 2);
 
