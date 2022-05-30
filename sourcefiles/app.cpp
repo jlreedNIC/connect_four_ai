@@ -9,19 +9,19 @@
 
 #include "app.h"
 
-App::App() : window(sf::VideoMode(600,600), "Connect Four AI Test")
+App::App() : window(sf::VideoMode(600,600), "Connect Four AI Test"), gameBoard(), agent()
 {
     // constructor
     std::cout << "app constructor called\n";
     window.setPosition(sf::Vector2i(50,50)); // TO DO: look at how to set relative to each computer
 
     position = 0; // cursor column location
-    whoStarts = 1;
+    whoStarts = -1;
 
     // initialize cursor
     cursor.setPointCount(3);
     cursor.setRadius(25.f);
-    cursor.setFillColor(sf::Color::Green);
+    cursor.setFillColor(sf::Color::Black);
     cursor.setRotation(180.f);
     cursor.setPosition(sf::Vector2f(115.f, 60.f));
 
@@ -85,54 +85,73 @@ void App::startMenu()
 
 void App::runApp()
 {
-    while(window.isOpen()) // && checkForWin() == 0)
+    while(window.isOpen()) // && gameBoard.checkForWin() == 0)
     {
-        sf::Event event;
-
-        while(window.pollEvent(event))
+        if(whoStarts == -1)
         {
-            // std::cout << "started polling\n";
-            // sf::Keyboard::Key key;
-            // handle events
-            switch(event.type)
+            sf::Event event;
+            
+            while(window.pollEvent(event))
             {
-                case sf::Event::Closed:
-                    std::cout << "closing window\n";
-                    window.close();
-                    break;
-                case sf::Event::KeyPressed:
-                    // std::cout << "key pressed\n";
-                    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-                    {
-                        moveCursor(sf::Keyboard::Left);
-                    }
-                    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-                    {
-                        moveCursor(sf::Keyboard::Right);
-                    }
-                    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
-                    {
-                        // placeToken(1);
-                        std::cout << "placing token\n";
-                    }
-                    break;
-                default:
-                    break;
+                // std::cout << "started polling\n";
+                // sf::Keyboard::Key key;
+                // handle events
+                switch(event.type)
+                {
+                    case sf::Event::Closed:
+                        std::cout << "closing window\n";
+                        window.close();
+                        break;
+                    case sf::Event::KeyPressed:
+                        // std::cout << "key pressed\n";
+                        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+                        {
+                            moveCursor(sf::Keyboard::Left);
+                        }
+                        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+                        {
+                            moveCursor(sf::Keyboard::Right);
+                        }
+                        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+                        {
+                            gameBoard.placeToken(-1, position);
+                            whoStarts = 1;
+                            // placeToken(1);
+                            std::cout << "placing token\n";
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
+        else
+        {
+            // computer turn
+            int tokenPosition = agent.pickMove(gameBoard.getBoard());
+            gameBoard.placeToken(1, tokenPosition);
 
-        // if(checkForWin() != 0)
-        // {
-        //     // function for displaying winner
-        //     std::cout << "we have a winner!\n";
-            
-        // }
+            whoStarts = -1;
+        }
+
+        updateGameBoard();
+        updateCursor();
+        
 
         window.clear(sf::Color::White);
 
         // draw things
         drawGameBoard(); // board & cursor
         window.display();
+
+        int winner = gameBoard.checkForWin();
+        if(winner != 0)
+        {
+            // function for displaying winner
+            std::cout << "we have a winner! " << winner << "\n";
+            exitScreen();
+            
+        }
 
     }
 }
@@ -145,6 +164,13 @@ void App::drawGameBoard()
             window.draw(boardHoles[i][j]);
 
     window.draw(cursor);
+}
+
+void App::exitScreen()
+{
+    std::cout << "Thanks for playing!\n";
+    sleep(1);
+    window.close();
 }
 
 void App::moveCursor(const sf::Keyboard::Key &direction)
@@ -165,4 +191,24 @@ void App::moveCursor(const sf::Keyboard::Key &direction)
 
     std::cout << "cursor over " << position << "\n";
     
+}
+
+void App::updateGameBoard()
+{
+    for(int i=0; i<6; i++)
+        for(int j=0; j<7; j++)
+        {
+            if(gameBoard.getBoard()[i][j] == 1)
+                boardHoles[i][j].setFillColor(sf::Color::Black);
+            else if(gameBoard.getBoard()[i][j] == -1)
+                boardHoles[i][j].setFillColor(sf::Color::Red);
+        }
+}
+
+void App::updateCursor()
+{
+    if(whoStarts == 1)
+        cursor.setFillColor(sf::Color::Black);
+    else if(whoStarts == -1)
+        cursor.setFillColor(sf::Color::Red);
 }
