@@ -15,7 +15,7 @@ App::App() : window(sf::VideoMode(600,600), "Connect Four AI Test"), gameBoard()
     std::cout << "app constructor called\n";
     window.setPosition(sf::Vector2i(50,50)); // TO DO: look at how to set relative to each computer
 
-    position = 0; // cursor column location
+    position = 3; // cursor column location
     whoStarts = -1;
 
     // initialize cursor
@@ -23,7 +23,7 @@ App::App() : window(sf::VideoMode(600,600), "Connect Four AI Test"), gameBoard()
     cursor.setRadius(25.f);
     cursor.setFillColor(sf::Color::Black);
     cursor.setRotation(180.f);
-    cursor.setPosition(sf::Vector2f(115.f, 60.f));
+    cursor.setPosition(sf::Vector2f(325.f, 60.f));
 
     // initialize board background
     boardBackground.setFillColor(sf::Color::Blue);
@@ -114,10 +114,16 @@ void App::runApp()
                         }
                         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
                         {
-                            gameBoard.placeToken(-1, position);
-                            whoStarts = 1;
-                            // placeToken(1);
-                            std::cout << "placing token\n";
+                            int result = gameBoard.placeToken(-1, position);
+                            if(result == -1)
+                            {
+                                std::cout << "invalid column. Try again.\n";
+                            }
+                            else
+                            {
+                                whoStarts = 1;
+                                std::cout << "placing token\n";
+                            }
                         }
                         break;
                     default:
@@ -128,8 +134,10 @@ void App::runApp()
         else
         {
             // computer turn
+            sleep(.75);
             int tokenPosition = agent.pickMove(gameBoard.getBoard());
             gameBoard.placeToken(1, tokenPosition);
+            std::cout << "computer chose " << tokenPosition << "\n";
 
             whoStarts = -1;
         }
@@ -169,8 +177,18 @@ void App::drawGameBoard()
 void App::exitScreen()
 {
     std::cout << "Thanks for playing!\n";
-    sleep(1);
-    window.close();
+    sf::Event event;
+    while(window.pollEvent(event))
+    {
+        if(event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed)
+        {
+            window.close();
+        }
+    }
+
+    // std::cout << "Thanks for playing!\n";
+    // sleep(1);
+    // window.close();
 }
 
 void App::moveCursor(const sf::Keyboard::Key &direction)

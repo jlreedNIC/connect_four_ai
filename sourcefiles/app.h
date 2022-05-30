@@ -33,6 +33,9 @@ class App
         sf::RectangleShape boardBackground;
         sf::CircleShape boardHoles[6][7];
 
+        // sf::Font basicFont;
+        // sf::Text basicText;
+
         void drawGameBoard();
         void exitScreen();
         // void drawCursor(const int &direction=-1);
