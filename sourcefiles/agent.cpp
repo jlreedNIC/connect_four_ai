@@ -41,7 +41,10 @@ int Agent::minValue(Environment gameState, int move, int depth)
     // gamestate should be temporary variable (not passed by reference)
 
     // std::cout << "checking min node for " << move << "...\n";
-    gameState.placeToken(1, move);
+    int result = gameState.placeToken(1, move);
+    // std::cout << "placing token result" << result << "\n";
+    if(result == -1)
+        return -1;
 
     // loss
     int value = gameState.checkForWin();
@@ -104,7 +107,10 @@ int Agent::maxValue(Environment gameState, int move, int depth)
 
     // apply move to state
     // TO DO: need to handle if error
-    gameState.placeToken(-1, move);
+    int result = gameState.placeToken(-1, move);
+    // std::cout << "placing token result" << result << "\n";
+    if(result == -1)
+        return 1;
 
     // check for loss
     int value = gameState.checkForWin(-1);
