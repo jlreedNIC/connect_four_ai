@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <string>
 #include "agent.h"
+#include "environment.h"
 
 class Connect4App
 {
@@ -16,21 +17,16 @@ class Connect4App
         void gameLoop();
 
     private:
-        int board[6][7]; // 1 for comp, -1 for player
         int cursor;
-        int start;
+        int whoStarts;
 
         void printGameBoard();
-        void placeToken(int player);
 
         void exitScreen();
 
-        int checkForWin();
-        int horizWinCheck(int i, int j, int winstate);
-        int vertWinCheck(int i, int j, int winstate);
-        int diagWinCheck(int i, int j, int winstate);
 
-        AgentConnect4 gameAgent;
+        Agent gameAgent;
+        Environment gameBoard;
 };
 
 
