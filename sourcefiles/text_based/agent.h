@@ -2,36 +2,24 @@
 #define AGENT_H
 
 #include <iostream>
-#include <algorithm>
+#include <algorithm> // for min and max functions
+#include "environment.h"
 
-class AgentConnect4
+class Agent
 {
     public:
-        AgentConnect4();
-        ~AgentConnect4();
+        Agent();
+        ~Agent();
 
-        int pickMove(int arrBoard[][7]);
+        int pickMove(int **gameBoard); // instead of gameBoard, do environment or assign gameboard values to new environment
 
     private:
-        int maxValue(int state[][7], int move, int depth);
-        int minValue(int state[][7], int move, int depth);
-
-        // checking for a win
-        // functions copied from textApp.h
-        // find something more efficient
-        int checkForWin(int arrBoard[][7]);
-        int horizWinCheck(int arrBoard[][7], int i, int j, int winstate);
-        int vertWinCheck(int arrBoard[][7], int i, int j, int winstate);
-        int diagWinCheck(int arrBoard[][7], int i, int j, int winstate);
-
-        void placeToken(int arrBoard[][7], int player, int position);
-
-        bool checkForDraw(int arrBoard[][7]);
-
-
         int maxDepth;
 
-};
+        // helper functions for pickMove
+        int maxValue(Environment gameState, int move, int depth);
+        int minValue(Environment gameState, int move, int depth);
 
+};
 
 #endif
