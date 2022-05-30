@@ -1,5 +1,5 @@
 # macros
-gxx = g++ -std=c++17
+gxx = g++ -std=c++11
 flags = -Wall -Wextra -pedantic -pedantic-errors
 # sfml = -lsfml-window -lsfml-graphics -lsfml-system
 
@@ -13,12 +13,14 @@ $(obj)/%.o : %.cpp
 	mkdir -p $(obj)
 	$(gxx) $(flags) $^ -c -o $@ 
 
-$(exec) : $(obj)/mainText.o $(obj)/textApp.o $(obj)/agent.o
+$(exec) : $(obj)/mainText.o $(obj)/environment.o $(obj)/agent.o $(obj)/textApp.o
 	$(gxx) $(flags) $^ -o $@ 
 
-# $(obj)/mainText.o : $(obj)/textApp.o
+# $(obj)/mainText.o : textApp.h
 
-# $(obj)/textApp.o : $(obj)/agent.o
+# $(obj)/textApp.o : agent.h environment.h
+
+# $(obj)/agent.o : environment.h
 
 test: $(exec)
 	./$(exec)
