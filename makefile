@@ -11,10 +11,12 @@ obj = $(src)/obj
 # pattern
 $(obj)/%.o : $(src)/%.cpp
 	mkdir -p $(obj)
-	$(gxx) $(flags) $^ -c -o $@ $(sfml)
+	$(gxx) $(flags) $< -c -o $@ $(sfml)
 
 $(exec) : $(obj)/main.o $(obj)/app.o 
 	$(gxx) $(flags) $^ -o $@ $(sfml)
+
+$(obj)/main.o : $(src)/app.h
 
 test: $(exec)
 	./$(exec)
