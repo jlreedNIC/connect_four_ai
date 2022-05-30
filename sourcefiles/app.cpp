@@ -9,6 +9,11 @@
 
 #include "app.h"
 
+/**
+ * @brief Construct a new App object. Creates the gameboard, the agent, and
+ *        the graphics for the game. 
+ * 
+ */
 App::App() : window(sf::VideoMode(600,600), "Connect Four AI Test"), gameBoard(), agent()
 {
     // constructor
@@ -52,12 +57,20 @@ App::App() : window(sf::VideoMode(600,600), "Connect Four AI Test"), gameBoard()
     
 }
 
+/**
+ * @brief Destroys the App
+ * 
+ */
 App::~App()
 {
     // destructor
     std::cout << "app destructor called\n";
 }
 
+/**
+ * @brief Pops up a start menu so players can choose who goes first
+ * 
+ */
 void App::startMenu()
 {
     // while(window.isOpen())
@@ -83,18 +96,21 @@ void App::startMenu()
 //     playerFirst.setOutlineColor(sf::Color::Black);
 // }
 
+/**
+ * @brief Main game loop.
+ * 
+ */
 void App::runApp()
 {
-    while(window.isOpen()) // && gameBoard.checkForWin() == 0)
+    while(window.isOpen())
     {
         if(whoStarts == -1)
         {
+            // player starts
             sf::Event event;
             
             while(window.pollEvent(event))
             {
-                // std::cout << "started polling\n";
-                // sf::Keyboard::Key key;
                 // handle events
                 switch(event.type)
                 {
@@ -103,7 +119,6 @@ void App::runApp()
                         window.close();
                         break;
                     case sf::Event::KeyPressed:
-                        // std::cout << "key pressed\n";
                         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
                         {
                             moveCursor(sf::Keyboard::Left);
@@ -145,7 +160,6 @@ void App::runApp()
         updateGameBoard();
         updateCursor();
         
-
         window.clear(sf::Color::White);
 
         // draw things
@@ -153,17 +167,23 @@ void App::runApp()
         window.display();
 
         int winner = gameBoard.checkForWin();
-        if(winner != 0)
+        bool draw = gameBoard.checkForDraw();
+        if(winner != 0 || draw)
         {
             // function for displaying winner
             std::cout << "we have a winner! " << winner << "\n";
             exitScreen();
-            
         }
+        
 
     }
 }
 
+/**
+ * @brief Draws the gameboard (broken into boardBackground and boardHoles) 
+ *        and the cursor on the window.
+ * 
+ */
 void App::drawGameBoard()
 {
     window.draw(boardBackground);
@@ -174,6 +194,11 @@ void App::drawGameBoard()
     window.draw(cursor);
 }
 
+/**
+ * @brief Provides a screen to show when exiting the game after a win
+ *        or a draw. Allows exit after key pressed or exit button clicked.
+ * 
+ */
 void App::exitScreen()
 {
     std::cout << "Thanks for playing!\n";
@@ -191,6 +216,12 @@ void App::exitScreen()
     // window.close();
 }
 
+/**
+ * @brief Moves the cursor left or right based on the key pressed.
+ *        Moves the cursor a set amount to line up with the board holes.
+ * 
+ * @param direction sf::Keyboard::Key that was pressed, defaults to Unknown key
+ */
 void App::moveCursor(const sf::Keyboard::Key &direction)
 {    
     sf::Vector2f moveVector(0.f, 0.f);
@@ -211,6 +242,12 @@ void App::moveCursor(const sf::Keyboard::Key &direction)
     
 }
 
+/**
+ * @brief Updates the board holes to the right color based
+ *        on whose token is there. Computer is black, player
+ *        is red.
+ * 
+ */
 void App::updateGameBoard()
 {
     for(int i=0; i<6; i++)
@@ -223,6 +260,11 @@ void App::updateGameBoard()
         }
 }
 
+/**
+ * @brief Updates the cursor to match the color of whose
+ *        turn it is to place a token.
+ * 
+ */
 void App::updateCursor()
 {
     if(whoStarts == 1)
