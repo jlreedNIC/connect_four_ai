@@ -22,31 +22,26 @@ class App
         ~App();
 
         void runApp();
-
         void startMenu();
 
     private:
         sf::RenderWindow window;
-        // sf::CircleShape cursor;
-        sf::Vector2f cursorPos;
+        sf::CircleShape cursor;
+        sf::RectangleShape boardBackground;
+        sf::CircleShape boardHoles[6][7];
+
 
         void drawGameBoard();
         // void drawCursor(const int &direction=-1);
         void moveCursor(const sf::Keyboard::Key &direction=sf::Keyboard::Unknown);
-        void drawCursor();
 
 
         // board variables and functions
-        int position; // where in the board to put a token
-        int boardNum[7][6]; // num representation of board
-        int whoStarts;
+        int position; // column position of cursor
+        int whoStarts; // 1 for computer, -1 for opponent
 
-        void placeToken(int player);
+        
 
-        int checkForWin();
-        int horizWinCheck(int i, int j, int winstate);
-        int vertWinCheck(int i, int j, int winstate);
-        int diagWinCheck(int i, int j, int winstate);
 
         
 
