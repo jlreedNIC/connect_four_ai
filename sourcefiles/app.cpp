@@ -202,12 +202,15 @@ void App::drawGameBoard()
 void App::exitScreen()
 {
     std::cout << "Thanks for playing!\n";
-    sf::Event event;
-    while(window.pollEvent(event))
+    while(window.isOpen())
     {
-        if(event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed)
+        sf::Event event;
+        while(window.pollEvent(event))
         {
-            window.close();
+            if(event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed)
+            {
+                window.close();
+            }
         }
     }
 
