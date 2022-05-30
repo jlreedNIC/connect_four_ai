@@ -7,13 +7,17 @@ class Environment
 {
     public:
         Environment();
-        // need to add copy assignment
+        Environment(int** otherGameBoard);
+        Environment(const Environment &gameState);
         ~Environment();
+
+        void operator= (const Environment &that);
 
         int** getBoard();   // is this function needed?
         // think about printing gameboard instead, or returning string with values
         // or maybe return board[i][j] just for gui sake?
 
+        int checkForWin();
         int checkForWin(const int &player);
         int placeToken(const int &player, const int &position); // return -1 if placing token was unsuccessful
         bool checkForDraw();

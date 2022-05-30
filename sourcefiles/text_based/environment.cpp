@@ -18,6 +18,42 @@ Environment::Environment()
 
 }
 
+Environment::Environment(int** otherGameBoard)
+{
+    board = new int*[6];
+    for(int i=0; i<6; i++)
+        board[i] = new int[7];
+
+    for(int i=0; i<6; i++)
+        for(int j=0; j<7; j++)
+            board[i][j] = otherGameBoard[i][j];
+    
+    std::cout << "other constructor called\n";
+}
+
+Environment::Environment(const Environment &gameState)
+{
+    // something about copy constructor not being called in -std=c++17
+    board = new int*[6];
+    for(int i=0; i<6; i++)
+        board[i] = new int[7];
+
+    for(int i=0; i<6; i++)
+        for(int j=0; j<7; j++)
+            board[i][j] = gameState.board[i][j];
+    
+    std::cout << "copy constructor called\n";
+}
+
+void Environment::operator= (const Environment &that)
+{
+    for(int i=0; i<6; i++)
+        for(int j=0; j<7; j++)
+            board[i][j] = that.board[i][j];
+    
+    std::cout << "assignment operator\n";
+}
+
 /**
  * @brief Destroy the environment. Deallocates memory.
  * 
@@ -89,6 +125,17 @@ bool Environment::checkForDraw() // rename checkEmptyBoard?
                 return false;
     
     return true;
+}
+
+int Environment::checkForWin()
+{
+    int win = checkForWin(1);
+    if(win == 1)
+        return win;
+    win = checkForWin(-1);
+    if(win == -1)
+        return win;
+    return 0;
 }
 
 /**
