@@ -3,11 +3,12 @@
 Agent::Agent()
 {
     maxDepth = 4; 
+    std::cout << "Agent created\n";
 }
 
 Agent::~Agent()
 {
-
+    std::cout << "Agent Destroyed\n";
 }
 
 int Agent::pickMove(int **gameBoard)
@@ -43,18 +44,26 @@ int Agent::minValue(Environment gameState, int move, int depth)
     gameState.placeToken(1, move);
 
     // loss
-    int value = gameState.checkForWin(-1);
+    int value = gameState.checkForWin();
     // std::cout << "win value " << value << "\n";
-    if(value == -1)
+    
+    // for(int i=0; i<6; i++)
+    // {
+    //     for(int j=0; j<7; j++)
+    //         std::cout << gameState.getBoard()[i][j] << " ";
+    //     std::cout << "\n";
+    // }
+
+    if(value != 0)
     {
-        // std::cout << "returning: " << -1000-depth << "\n";
-        return -1000-depth;
+        // std::cout << "returning: " << (1000*value)+(value*depth) << "\n";
+        return (1000*value)+(value*depth);
     }
 
     // win
-    value = gameState.checkForWin(1);
-    if(value == 1)
-        return 1000+depth;
+    // value = gameState.checkForWin(1);
+    // if(value == 1)
+    //     return 1000+depth;
     
     if(gameState.checkForDraw())
     {
@@ -126,7 +135,7 @@ int Agent::maxValue(Environment gameState, int move, int depth)
 
     value = 1000 - depth;
     int bestValue = 1000 - depth;
-    int bestMove = 0;
+    // int bestMove = 0;
     // check max of every next state = min state
     for(int i=0; i<7; i++)
     {
@@ -134,7 +143,7 @@ int Agent::maxValue(Environment gameState, int move, int depth)
         if(value > bestValue)
         {
             bestValue = value;
-            bestMove = i;
+            // bestMove = i;
         }
     }
     // std::cout << "max: " << value << " bestValue: " << bestValue << " move: " << bestMove << "\n";
