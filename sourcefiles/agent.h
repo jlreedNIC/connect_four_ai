@@ -25,8 +25,8 @@ class Agent
         int evaluate(Environment &gameState);
         int horizWeight(Environment &gameState, const int &row, const int &column, const int &player);
         int vertWeight(Environment &gameState, const int &row, const int &column, const int &player);
-        int horizToken(Environment &gameState, const int &row, const int &player);
-        int vertToken(Environment &gameState, const int &column, const int &player);
+        int posDiagWeight(Environment &gameState, const int &row, const int &column, const int &player);
+        int negDiagWeight(Environment &gameState, const int &row, const int &column, const int &player);
 
 };
 
