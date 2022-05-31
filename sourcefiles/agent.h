@@ -15,8 +15,8 @@ class Agent
 
     private:
         int maxDepth;
-        int winValue, loseValue;
-        int errorVal;
+        int winValue;
+        int errorValue;
 
         // helper functions for pickMove
         int maxValue(Environment gameState, int move, int depth);

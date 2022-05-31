@@ -1,10 +1,14 @@
 #include "agent.h"
 
+/**
+ * @brief Construct a new Agent object. Sets the winValue, errorValue, and maxDepth.
+ * 
+ */
 Agent::Agent()
 {
-    maxDepth = 3; 
+    maxDepth = 4; 
     winValue = 1000;
-    errorVal = winValue*10;
+    errorValue = winValue*10;
     // std::cout << "Agent created\n";
 }
 
@@ -13,6 +17,12 @@ Agent::~Agent()
     // std::cout << "Agent Destroyed\n";
 }
 
+/**
+ * @brief Picks the best move for the agent to make on the given gameboard based off of minmax searching. 
+ * 
+ * @param gameBoard Current state of the gameboard
+ * @return int move agent should make
+ */
 int Agent::pickMove(int **gameBoard)
 {
     Environment gameState = gameBoard;
@@ -31,7 +41,7 @@ int Agent::pickMove(int **gameBoard)
         {
             // std::cout << "not this root node\n";
             if(bestMove < 7) bestMove++;
-            bestValue = errorVal*-1;
+            bestValue = errorValue*-1;
             // std::cout << "bestval: " << bestValue << " bestmove: " << bestMove << "\n";
             
         }
@@ -47,6 +57,15 @@ int Agent::pickMove(int **gameBoard)
     return bestMove;
 }
 
+/**
+ * @brief Gives the minimum value of all of the possible choices, which are all maximum nodes or
+ *        a win, loss, draw, or evaluation of the state
+ * 
+ * @param gameState board configuration
+ * @param move potential next move to make
+ * @param depth current depth of search tree
+ * @return int minimum of all choices
+ */
 int Agent::minValue(Environment gameState, int move, int depth)
 {
     // gamestate should be temporary variable (not passed by reference)
@@ -57,7 +76,7 @@ int Agent::minValue(Environment gameState, int move, int depth)
     if(result == -1)
         return -1;
 
-    // loss
+    // win or loss
     int value = gameState.checkForWin();
     // std::cout << "win value " << value << "\n";
     
@@ -77,10 +96,6 @@ int Agent::minValue(Environment gameState, int move, int depth)
         return (winValue*value)+(value*depth);
     }
 
-    // win
-    // value = gameState.checkForWin(1);
-    // if(value == 1)
-    //     return 1000+depth;
     
     if(gameState.checkForDraw())
     {
@@ -120,6 +135,15 @@ int Agent::minValue(Environment gameState, int move, int depth)
     return bestValue;
 }
 
+/**
+ * @brief Gives the maximum value of all of the possible choices, which are all minimum nodes or
+ *        a win, loss, draw, or evaluation of the state
+ * 
+ * @param gameState board configuration
+ * @param move potential next move to make
+ * @param depth current depth of search tree
+ * @return int maximum of all choices
+ */
 int Agent::maxValue(Environment gameState, int move, int depth)
 {
     // gamestate should be temporary variable (not passed by reference)
@@ -127,7 +151,6 @@ int Agent::maxValue(Environment gameState, int move, int depth)
     // std::cout << "checking max node " << move << "...\n";
 
     // apply move to state
-    // TO DO: need to handle if error
     int result = gameState.placeToken(-1, move);
     // std::cout << "placing token result" << result << "\n";
     if(result == -1)
@@ -149,11 +172,6 @@ int Agent::maxValue(Environment gameState, int move, int depth)
         // std::cout << "returning: " << (winValue*value)+(value*depth) << "\n";
         return (winValue*value)+(value*depth);
     }
-
-    // win
-    // value = gameState.checkForWin(1);
-    // if(value == 1)
-    //     return 1000+depth;
     
     if(gameState.checkForDraw())
     {
@@ -192,6 +210,14 @@ int Agent::maxValue(Environment gameState, int move, int depth)
     return bestValue;
 }
 
+/**
+ * @brief Assigns a value to each node based off of the tokens in a row containing that node.
+ *        Adds the weight from the computer, subtracts the weight from the player.
+ *        Calculates the weights according to the horizontal, vertical, and both diagonals.
+ * 
+ * @param gameState Board configuration to give a weight to.
+ * @return int weight (or score) of the board based on how many tokens in a row, plus how many available spaces
+ */
 int Agent::evaluate(Environment &gameState)
 {
     int weight = 0;
@@ -227,11 +253,11 @@ int Agent::evaluate(Environment &gameState)
 /**
  * @brief gives a weight for the specific token based on the horizontal checks.
  * 
- * @param gameState 
- * @param row 
- * @param column 
- * @param player 
- * @return int 
+ * @param gameState Board configuration to check
+ * @param row Row position of the specific node
+ * @param column Column position of the specific node
+ * @param player which player to check for, 1 or -1
+ * @return int weight based on how many squares are filled and empty, or 0 if no possible win
  */
 int Agent::horizWeight(Environment &gameState, const int &row, const int &column, const int &player)
 {
@@ -289,6 +315,15 @@ int Agent::horizWeight(Environment &gameState, const int &row, const int &column
     }
 }
 
+/**
+ * @brief gives a weight for the specific token based on the vertical checks.
+ * 
+ * @param gameState Board configuration to check
+ * @param row Row position of the specific node
+ * @param column Column position of the specific node
+ * @param player which player to check for, 1 or -1
+ * @return int weight based on how many squares are filled and empty, or 0 if no possible win
+ */
 int Agent::vertWeight(Environment &gameState, const int &row, const int &column, const int &player)
 {
     int end=0, ex=0, ey=0; // checking ends
@@ -344,6 +379,15 @@ int Agent::vertWeight(Environment &gameState, const int &row, const int &column,
     }
 }
 
+/**
+ * @brief gives a weight for the specific token based on the diagonal with a positive slope
+ * 
+ * @param gameState Board configuration to check
+ * @param row Row position of the specific node
+ * @param column Column position of the specific node
+ * @param player which player to check for, 1 or -1
+ * @return int weight based on how many squares are filled and empty, or 0 if no possible win
+ */
 int Agent::posDiagWeight(Environment &gameState, const int &row, const int &column, const int &player)
 {
     // std::cout << "Starting posdiagweight check\n";
@@ -406,6 +450,15 @@ int Agent::posDiagWeight(Environment &gameState, const int &row, const int &colu
     }
 }
 
+/**
+ * @brief gives a weight for the specific token based on the diagonal with a negative slope
+ * 
+ * @param gameState Board configuration to check
+ * @param row Row position of the specific node
+ * @param column Column position of the specific node
+ * @param player which player to check for, 1 or -1
+ * @return int weight based on how many squares are filled and empty, or 0 if no possible win
+ */
 int Agent::negDiagWeight(Environment &gameState, const int &row, const int &column, const int &player)
 {
     // std::cout << "Starting negdiagweight check\n";
