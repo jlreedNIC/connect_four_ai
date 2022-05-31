@@ -6,7 +6,7 @@
  */
 Agent::Agent()
 {
-    maxDepth = 4; 
+    maxDepth = 7; 
     winValue = 1000;
     errorValue = winValue*10;
     // std::cout << "Agent created\n";
@@ -27,7 +27,7 @@ int Agent::pickMove(int **gameBoard)
 {
     Environment gameState = gameBoard;
     
-    int value = 0;
+    int value = -winValue;
     int bestValue = -winValue;
     int bestMove = 0;
     // maxDepth++; // maybe implement with alphabeta pruning
@@ -36,11 +36,12 @@ int Agent::pickMove(int **gameBoard)
     for(int i=0; i<7; i++)
     {
         // std::cout << "\nstarting minmax search for max node " << i << "\n";
-        value = minValue(gameState, i, 1); // might be min value function...not sure
+        // value = abMinValue(gameState, value, i, 1); // might be min value function...not sure
+        value = minValue(gameState, i, 1);
         if(value == -1) 
         {
             // std::cout << "not this root node\n";
-            if(bestMove < 7) bestMove++;
+            if(bestMove < 6) bestMove++;
             bestValue = errorValue*-1;
             // std::cout << "bestval: " << bestValue << " bestmove: " << bestMove << "\n";
             
@@ -66,7 +67,7 @@ int Agent::pickMove(int **gameBoard)
  * @param depth current depth of search tree
  * @return int minimum of all choices
  */
-int Agent::minValue(Environment gameState, int move, int depth)
+int Agent::minValue(Environment gameState, const int &move, const int &depth)
 {
     // gamestate should be temporary variable (not passed by reference)
 
@@ -144,7 +145,7 @@ int Agent::minValue(Environment gameState, int move, int depth)
  * @param depth current depth of search tree
  * @return int maximum of all choices
  */
-int Agent::maxValue(Environment gameState, int move, int depth)
+int Agent::maxValue(Environment gameState, const int &move, const int &depth)
 {
     // gamestate should be temporary variable (not passed by reference)
 
@@ -207,6 +208,129 @@ int Agent::maxValue(Environment gameState, int move, int depth)
         }
     }
     // std::cout << "max: " << value << " bestValue: " << bestValue << " move: " << bestMove << "\n";
+    return bestValue;
+}
+
+// function alphabeta(node, depth, α, β, maximizingPlayer) is
+//     if depth = 0 or node is a terminal node then
+//         return the heuristic value of node
+//     if maximizingPlayer then
+//         value := −∞
+//         for each child of node do
+//             value := max(value, alphabeta(child, depth − 1, α, β, FALSE))
+//             if value ≥ β then
+//                 break (* β cutoff *)
+//             α := max(α, value)
+//         return value
+//     else
+//         value := +∞
+//         for each child of node do
+//             value := min(value, alphabeta(child, depth − 1, α, β, TRUE))
+//             if value ≤ α then
+//                 break (* α cutoff *)
+//             β := min(β, value)
+//         return value
+// (* Initial call *)
+// alphabeta(origin, depth, −∞, +∞, TRUE)
+
+int Agent::abMaxValue(Environment gameState, const int &bestMinValue, const int &move, const int &depth)
+{
+    // std::cout << "checking max ab node " << move << "...\n";
+
+    // apply move to state
+    int result = gameState.placeToken(-1, move);
+    if(result == -1)
+        return 1;
+
+    // check for win or loss
+    int value = gameState.checkForWin();
+    if(value != 0)
+    {
+        // std::cout << "returning: " << (winValue*value)+(value*depth) << "\n";
+        return (winValue*value)+(value*depth);
+    }
+    
+    if(gameState.checkForDraw())
+        return 0;
+
+    // leaf node
+    if(depth == maxDepth)
+        return evaluate(gameState);
+
+    value = -winValue + depth;
+    int bestValue = -winValue + depth;
+    
+    int bestMove = 0;
+    // check max of every next state = min state
+    for(int i=0; i<7; i++)
+    {
+        value = std::max(value, abMinValue(gameState, value, i, depth+1));
+        if(value == -1) 
+        {
+            // std::cout << "not this max node\n";
+            // error placing
+            if(bestMove <7) bestMove++;
+        }
+        else if(value > bestValue)
+        {
+            bestValue = value;
+            bestMove = i;
+        }
+        if(i > 0 && bestValue < bestMinValue)
+        {
+            std::cout << "alphabeta engaged on max node " << i << "\n";
+            break;
+        }
+    }
+    // std::cout << "max: " << value << " bestValue: " << bestValue << " move: " << bestMove << "\n";
+    return bestValue;
+}
+
+int Agent::abMinValue(Environment gameState, const int &bestMaxValue, const int &move, const int &depth)
+{
+    // std::cout << "checking min node" << move << "...\n";
+    int result = gameState.placeToken(1, move);
+    if(result == -1)
+        return -1;
+
+    // win or loss
+    int value = gameState.checkForWin();
+
+    if(value != 0)
+        return (winValue*value)+(value*depth);
+    
+    if(gameState.checkForDraw())
+        return 0;
+
+    // leaf node
+    if(depth == maxDepth)
+        return evaluate(gameState);
+
+    value = winValue-depth;
+    int bestValue = winValue-depth;
+    int bestMove = 0;
+    // checking next states
+    for(int i=0; i<7; i++)
+    {
+        value = std::min(value, abMaxValue(gameState, value, i, depth+1));
+        if(value == -1) 
+        {
+            // std::cout << "not this min node\n";
+            // error placing
+            if(bestMove < 7) bestMove++;
+        }
+        else if(value < bestValue)
+        {
+            bestValue = value;
+            bestMove = i;
+        }
+        if(i > 0 && bestValue > bestMaxValue)
+        {
+            std::cout << "alphabeta engaged on min node " << i << "\n";
+            break;
+        }
+    }
+    // std::cout << "min: " << value << " bestValue: " << bestValue << " move: " << bestMove << "\n";
     return bestValue;
 }
 

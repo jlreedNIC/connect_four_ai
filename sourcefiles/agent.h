@@ -19,8 +19,11 @@ class Agent
         int errorValue;
 
         // helper functions for pickMove
-        int maxValue(Environment gameState, int move, int depth);
-        int minValue(Environment gameState, int move, int depth);
+        int maxValue(Environment gameState, const int &move, const int &depth);
+        int minValue(Environment gameState, const int &move, const int &depth);
+
+        int abMaxValue(Environment gameState, const int &bestMinValue, const int &move, const int &depth);
+        int abMinValue(Environment gameState, const int &bestMaxValue, const int &move, const int &depth);
 
         int evaluate(Environment &gameState);
         int horizWeight(Environment &gameState, const int &row, const int &column, const int &player);
