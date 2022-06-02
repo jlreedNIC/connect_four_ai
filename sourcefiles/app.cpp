@@ -149,7 +149,6 @@ void App::runApp()
         else
         {
             // computer turn
-            sleep(.75);
             int tokenPosition = agent.pickMove(gameBoard.getBoard());
             gameBoard.placeToken(1, tokenPosition);
             std::cout << "computer chose " << tokenPosition << "\n";
@@ -213,10 +212,6 @@ void App::exitScreen()
             }
         }
     }
-
-    // std::cout << "Thanks for playing!\n";
-    // sleep(1);
-    // window.close();
 }
 
 /**
