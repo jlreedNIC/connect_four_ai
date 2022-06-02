@@ -6,7 +6,7 @@
  */
 Agent::Agent()
 {
-    maxDepth = 4; 
+    maxDepth = 5; 
     winValue = 10000;
     errorValue = winValue*10;
     // std::cout << "Agent created\n";
@@ -145,8 +145,8 @@ int Agent::abMaxValue(Environment gameState, const int &move, const int &depth, 
 {
     // apply move to state
     int result = gameState.placeToken(-1, move);
-    // if(result == -1)
-    //     return 1;
+    if(result == -1)
+        return errorValue;
 
     // check for win or loss
     int value = gameState.checkForWin();
@@ -190,8 +190,8 @@ int Agent::abMinValue(Environment gameState, const int &move, const int &depth, 
 {
     // std::cout << "checking abmin node" << move << "...\n";
     int result = gameState.placeToken(1, move);
-    // if(result == -1)
-    //     return -1;
+    if(result == -1)
+        return errorValue*-1;
 
     // win or loss
     int value = gameState.checkForWin();
