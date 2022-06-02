@@ -6,8 +6,8 @@
  */
 Agent::Agent()
 {
-    maxDepth = 7; 
-    winValue = 1000;
+    maxDepth = 4; 
+    winValue = 10000;
     errorValue = winValue*10;
     // std::cout << "Agent created\n";
 }
@@ -32,13 +32,14 @@ int Agent::pickMove(int **gameBoard)
     int bestMove = 0;
     // maxDepth++; // maybe implement with alphabeta pruning
 
-    // call max of every state
+    int alpha = -winValue, beta = winValue;
+    // find max of every child (which is min node)
     for(int i=0; i<7; i++)
     {
         // std::cout << "\nstarting minmax search for max node " << i << "\n";
-        // value = abMinValue(gameState, value, i, 1); // might be min value function...not sure
+        // value = abMinValue(gameState, i, 1, beta, alpha);
         value = minValue(gameState, i, 1);
-        if(value == -1) 
+        if(value == -1) // error, don't go here (might be causing error with alphabeta)
         {
             // std::cout << "not this root node\n";
             if(bestMove < 6) bestMove++;
@@ -46,13 +47,13 @@ int Agent::pickMove(int **gameBoard)
             // std::cout << "bestval: " << bestValue << " bestmove: " << bestMove << "\n";
             
         }
-        else if(value > bestValue)
+        else if(value > bestValue) // finding max of min nodes
         {
             bestValue = value;
             bestMove = i;
             // std::cout << "best move found " << bestMove << " " << i << "\n";
         }
-        // std::cout << "value: " << value << " best value: " << bestValue << "\n";
+        // std::cout << "value: " << value << " best value: " << bestValue << " bestMove: " << bestMove << "\n";
     }
     // std::cout << "best move: " << bestMove << "\n";
     return bestMove;
@@ -69,71 +70,29 @@ int Agent::pickMove(int **gameBoard)
  */
 int Agent::minValue(Environment gameState, const int &move, const int &depth)
 {
-    // gamestate should be temporary variable (not passed by reference)
-
     // std::cout << "checking min node" << move << "...\n";
     int result = gameState.placeToken(1, move);
-    // std::cout << "placing token result" << result << "\n";
     if(result == -1)
         return -1;
 
     // win or loss
     int value = gameState.checkForWin();
-    // std::cout << "win value " << value << "\n";
-    
-    // if(value != 0)
-    // {
-    //     for(int i=0; i<6; i++)
-    //     {
-    //         for(int j=0; j<7; j++)
-    //             std::cout << gameState.getBoard()[i][j] << " ";
-    //         std::cout << "\n";
-    //     }
-    // }
+    if(value != 0) return (winValue*value)+(value*depth);
 
-    if(value != 0)
-    {
-        // std::cout << "returning: " << (winValue*value)+(value*depth) << "\n";
-        return (winValue*value)+(value*depth);
-    }
-
-    
-    if(gameState.checkForDraw())
-    {
-        // std::cout << "returning 0\n";
-        return 0;
-    }
+    // draw
+    if(gameState.checkForDraw()) return 0;
 
     // leaf node
-    if(depth == maxDepth)
-    {
-        // std::cout << "calling eval function\n";
-        // std::cout << "returning 0\n";
-        return evaluate(gameState);;
-    }
+    if(depth == maxDepth) return evaluate(gameState);
 
     value = winValue - depth;
-    int bestValue = winValue-depth;
-    // std::cout << "bestvalue: " << bestValue << "\n";
-    int bestMove = 0;
-    // checking next states
+    // find the minimum of the next state (which are all maximums)
     for(int i=0; i<7; i++)
     {
         value = std::min(value, maxValue(gameState, i, depth+1));
-        if(value == -1) 
-        {
-            // std::cout << "not this min node\n";
-            if(bestMove < 7) bestMove++;
-            // std::cout << "best Value: " << bestValue << " move: " << bestMove << "\n";
-        }
-        else if(value < bestValue)
-        {
-            bestValue = value;
-            bestMove = i;
-        }
     }
-    // std::cout << "min: " << value << " bestValue: " << bestValue << " move: " << bestMove << "\n";
-    return bestValue;
+
+    return value;
 }
 
 /**
@@ -147,191 +106,119 @@ int Agent::minValue(Environment gameState, const int &move, const int &depth)
  */
 int Agent::maxValue(Environment gameState, const int &move, const int &depth)
 {
-    // gamestate should be temporary variable (not passed by reference)
-
     // std::cout << "checking max node " << move << "...\n";
 
     // apply move to state
     int result = gameState.placeToken(-1, move);
-    // std::cout << "placing token result" << result << "\n";
     if(result == -1)
         return 1;
 
     // check for loss
     int value = gameState.checkForWin();
-    // std::cout << "win value " << value << "\n";
+    if(value != 0) return (winValue*value)+(value*depth);
     
-    // for(int i=0; i<6; i++)
-    // {
-    //     for(int j=0; j<7; j++)
-    //         std::cout << gameState.getBoard()[i][j] << " ";
-    //     std::cout << "\n";
-    // }
-
-    if(value != 0)
-    {
-        // std::cout << "returning: " << (winValue*value)+(value*depth) << "\n";
-        return (winValue*value)+(value*depth);
-    }
-    
-    if(gameState.checkForDraw())
-    {
-        // std::cout << "returning 0\n";
-        return 0;
-    }
+    if(gameState.checkForDraw()) return 0;
 
     // leaf node
-    if(depth == maxDepth)
-    {
-        // std::cout << "calling eval function\n";
-        // std::cout << "returning 0\n";
-        return evaluate(gameState);;
-    }
+    if(depth == maxDepth) return evaluate(gameState);
 
     value = -winValue + depth;
-    int bestValue = -winValue + depth;
-    
-    int bestMove = 0;
-    // check max of every next state = min state
+    // check max of every next state (which are mins)
     for(int i=0; i<7; i++)
     {
         value = std::max(value, minValue(gameState, i, depth+1));
-        if(value == -1) 
-        {
-            // std::cout << "not this max node\n";
-            if(bestMove <7) bestMove++;
-        }
-        else if(value > bestValue)
-        {
-            bestValue = value;
-            bestMove = i;
-        }
     }
-    // std::cout << "max: " << value << " bestValue: " << bestValue << " move: " << bestMove << "\n";
-    return bestValue;
+    return value;
 }
 
-// function alphabeta(node, depth, α, β, maximizingPlayer) is
-//     if depth = 0 or node is a terminal node then
-//         return the heuristic value of node
-//     if maximizingPlayer then
-//         value := −∞
-//         for each child of node do
-//             value := max(value, alphabeta(child, depth − 1, α, β, FALSE))
-//             if value ≥ β then
-//                 break (* β cutoff *)
-//             α := max(α, value)
-//         return value
-//     else
-//         value := +∞
-//         for each child of node do
-//             value := min(value, alphabeta(child, depth − 1, α, β, TRUE))
-//             if value ≤ α then
-//                 break (* α cutoff *)
-//             β := min(β, value)
-//         return value
-// (* Initial call *)
-// alphabeta(origin, depth, −∞, +∞, TRUE)
-
-int Agent::abMaxValue(Environment gameState, const int &bestMinValue, const int &move, const int &depth)
+/**
+ * @brief Using alpha beta pruning, return the maximum of the next move options.
+ * 
+ * @param gameState current board configuration
+ * @param move move to make on board
+ * @param depth current depth of search tree
+ * @param bestMinValue also known as beta, the current best value on the min tree
+ * @param bestMaxValue also known as alpha, the current best value of the max tree
+ * @return int maximum value of all choices
+ */
+int Agent::abMaxValue(Environment gameState, const int &move, const int &depth, int &bestMinValue, int &bestMaxValue)
 {
-    // std::cout << "checking max ab node " << move << "...\n";
-
     // apply move to state
     int result = gameState.placeToken(-1, move);
-    if(result == -1)
-        return 1;
+    // if(result == -1)
+    //     return 1;
 
     // check for win or loss
     int value = gameState.checkForWin();
-    if(value != 0)
-    {
-        // std::cout << "returning: " << (winValue*value)+(value*depth) << "\n";
-        return (winValue*value)+(value*depth);
-    }
+    if(value != 0) return (winValue*value)+(value*depth);
     
-    if(gameState.checkForDraw())
-        return 0;
+    // draw
+    if(gameState.checkForDraw()) return 0;
 
     // leaf node
-    if(depth == maxDepth)
-        return evaluate(gameState);
+    if(depth == maxDepth) return evaluate(gameState);
 
     value = -winValue + depth;
-    int bestValue = -winValue + depth;
-    
-    int bestMove = 0;
     // check max of every next state = min state
     for(int i=0; i<7; i++)
     {
-        value = std::max(value, abMinValue(gameState, value, i, depth+1));
-        if(value == -1) 
+        value = std::max(value, abMinValue(gameState, i, depth+1, bestMinValue, bestMaxValue));
+        if(value >= bestMinValue)
         {
-            // std::cout << "not this max node\n";
-            // error placing
-            if(bestMove <7) bestMove++;
+            // std::cout << " max ab value found: " << value << "\n";
+            return value;
         }
-        else if(value > bestValue)
+        else
         {
-            bestValue = value;
-            bestMove = i;
-        }
-        if(i > 0 && bestValue < bestMinValue)
-        {
-            std::cout << "alphabeta engaged on max node " << i << "\n";
-            break;
+            bestMaxValue = std::max(value, bestMaxValue);
         }
     }
-    // std::cout << "max: " << value << " bestValue: " << bestValue << " move: " << bestMove << "\n";
-    return bestValue;
+    return value;
 }
 
-int Agent::abMinValue(Environment gameState, const int &bestMaxValue, const int &move, const int &depth)
+/**
+ * @brief Using alpha beta pruning, return the minimum of the next move options.
+ * 
+ * @param gameState current board configuration
+ * @param move move to make on the board
+ * @param depth current depth of search tree
+ * @param bestMinValue also known as beta, the current best value on the min tree
+ * @param bestMaxValue also known as alpha, the current best value of the max tree
+ * @return int minimum value of all choices
+ */
+int Agent::abMinValue(Environment gameState, const int &move, const int &depth, int &bestMinValue, int &bestMaxValue)
 {
-    // std::cout << "checking min node" << move << "...\n";
+    // std::cout << "checking abmin node" << move << "...\n";
     int result = gameState.placeToken(1, move);
-    if(result == -1)
-        return -1;
+    // if(result == -1)
+    //     return -1;
 
     // win or loss
     int value = gameState.checkForWin();
-
-    if(value != 0)
-        return (winValue*value)+(value*depth);
+    if(value != 0) return (winValue*value)+(value*depth);
     
-    if(gameState.checkForDraw())
-        return 0;
+    // draw
+    if(gameState.checkForDraw()) return 0;
 
     // leaf node
-    if(depth == maxDepth)
-        return evaluate(gameState);
+    if(depth == maxDepth) return evaluate(gameState);
 
     value = winValue-depth;
-    int bestValue = winValue-depth;
-    int bestMove = 0;
     // checking next states
     for(int i=0; i<7; i++)
     {
-        value = std::min(value, abMaxValue(gameState, value, i, depth+1));
-        if(value == -1) 
+        value = std::min(value, abMaxValue(gameState, i, depth+1, bestMinValue, bestMaxValue));
+        if(value <= bestMaxValue)
         {
-            // std::cout << "not this min node\n";
-            // error placing
-            if(bestMove < 7) bestMove++;
+            // std::cout << " minimum ab value found: " << value << "\n";
+            return value;
         }
-        else if(value < bestValue)
+        else
         {
-            bestValue = value;
-            bestMove = i;
-        }
-        if(i > 0 && bestValue > bestMaxValue)
-        {
-            std::cout << "alphabeta engaged on min node " << i << "\n";
-            break;
+            bestMinValue = std::min(value, bestMinValue);
         }
     }
-    // std::cout << "min: " << value << " bestValue: " << bestValue << " move: " << bestMove << "\n";
-    return bestValue;
+    return value;
 }
 
 /**
@@ -392,6 +279,7 @@ int Agent::horizWeight(Environment &gameState, const int &row, const int &column
 
     int** board = gameState.getBoard();
 
+    // checks the board position passed in and adds to appropriate count
     if(board[row][column] == player) amtTokens++;
     else if(board[row][column] == 0) amtEmpty++;
     else
@@ -405,7 +293,7 @@ int Agent::horizWeight(Environment &gameState, const int &row, const int &column
     nj = column - 1;
     while(end < 2)
     {
-        // positive direction
+        // count in positive direction until end of board found or end of available space found
         if(ey == 0 && pj < 7 && board[row][pj] == player)
             amtTokens++;
 
@@ -415,7 +303,7 @@ int Agent::horizWeight(Environment &gameState, const int &row, const int &column
         if(pj >= 7 || board[row][pj] == (player*-1))
             ey = 1;
 
-        // negative direction
+        // count in negative direction until end of board found or end of available space found
         if(ex == 0 && nj >= 0 && board[row][nj] == player)
             amtTokens++;
         if(ex == 0 && nj >= 0 && board[row][nj] == 0)
@@ -427,13 +315,15 @@ int Agent::horizWeight(Environment &gameState, const int &row, const int &column
         pj++;
         nj--;
     }
+    // if 4 tokens in a row, return a win!
     if(amtTokens >= 4)
         return winValue;
     
+    // count available spaces
     amtAvail = amtTokens + amtEmpty;
-    if(amtAvail < 4)
+    if(amtAvail < 4) // if not enough spaces to win, return 0
         return 0;
-    else
+    else // return weighting function
     {
         return (amtTokens*5) + (amtEmpty*2);
     }
@@ -457,6 +347,7 @@ int Agent::vertWeight(Environment &gameState, const int &row, const int &column,
 
     int** board = gameState.getBoard();
 
+    // checks the board position passed in and adds to appropriate count
     if(board[row][column] == player) amtTokens++;
     else if(board[row][column] == 0) amtEmpty++;
     else 
@@ -469,7 +360,7 @@ int Agent::vertWeight(Environment &gameState, const int &row, const int &column,
     ni = column - 1;
     while(end < 2)
     {
-        // positive direction
+        // count in positive direction until end of board found or end of available space found
         if(ey == 0 && pi < 6 && board[pi][column] == player)
             amtTokens++;
 
@@ -479,7 +370,7 @@ int Agent::vertWeight(Environment &gameState, const int &row, const int &column,
         if(pi >= 6 || board[pi][column] == (player*-1))
             ey = 1;
 
-        // negative direction
+        // count in negative direction until end of board found or end of available space found
         if(ex == 0 && ni >= 0 && board[ni][column] == player)
             amtTokens++;
         if(ex == 0 && ni >= 0 && board[ni][column] == 0)
@@ -491,13 +382,15 @@ int Agent::vertWeight(Environment &gameState, const int &row, const int &column,
         pi++;
         ni--;
     }
+    // if 4 tokens in a row, return win
     if(amtTokens >= 4)
         return winValue;
     
+    // count available spaces
     amtAvail = amtTokens + amtEmpty;
-    if(amtAvail < 4)
+    if(amtAvail < 4) // if not enough spaces to win, return 0
         return 0;
-    else
+    else // return weighting function
     {
         return (amtTokens*5) + (amtEmpty*2);
     }
@@ -514,7 +407,6 @@ int Agent::vertWeight(Environment &gameState, const int &row, const int &column,
  */
 int Agent::posDiagWeight(Environment &gameState, const int &row, const int &column, const int &player)
 {
-    // std::cout << "Starting posdiagweight check\n";
     int end=0, ex=0, ey=0; // checking ends
     int pi = 0, ni = 0;
     int pj = 0, nj = 0;
@@ -523,6 +415,7 @@ int Agent::posDiagWeight(Environment &gameState, const int &row, const int &colu
 
     int** board = gameState.getBoard();
 
+    // checks the board position passed in and adds to appropriate count
     if(board[row][column] == player) amtTokens++;
     else if(board[row][column] == 0) amtEmpty++;
     else 
@@ -537,7 +430,7 @@ int Agent::posDiagWeight(Environment &gameState, const int &row, const int &colu
     nj = row - 1;
     while(end < 2)
     {
-        // positive direction
+        // count in positive direction until end of board found or end of available space found
         if(ey == 0 && ni >= 0 && pj < 7 && board[ni][pj] == player)
             amtTokens++;
 
@@ -547,7 +440,7 @@ int Agent::posDiagWeight(Environment &gameState, const int &row, const int &colu
         if(ni < 0 || pj >= 7 || board[ni][pj] == (player*-1))
             ey = 1;
 
-        // negative direction
+        // count in negative direction until end of board found or end of available space found
         if(ex == 0 && pi < 6 && nj >= 0 && board[pi][nj] == player)
             amtTokens++;
         if(ex == 0 && pi < 6 && nj >= 0 && board[pi][nj] == 0)
@@ -562,13 +455,15 @@ int Agent::posDiagWeight(Environment &gameState, const int &row, const int &colu
         nj--;
         
     }
+    // if 4 tokens in a row, return a win!
     if(amtTokens >= 4)
         return winValue;
     
+    // count available spaces
     amtAvail = amtTokens + amtEmpty;
-    if(amtAvail < 4)
+    if(amtAvail < 4) // if not enough spaces to win, return 0
         return 0;
-    else
+    else // return weighting function
     {
         return (amtTokens*5) + (amtEmpty*2);
     }
@@ -585,7 +480,6 @@ int Agent::posDiagWeight(Environment &gameState, const int &row, const int &colu
  */
 int Agent::negDiagWeight(Environment &gameState, const int &row, const int &column, const int &player)
 {
-    // std::cout << "Starting negdiagweight check\n";
     int end=0, ex=0, ey=0; // checking ends
     int pi = 0, ni = 0;
     int pj = 0, nj = 0;
@@ -594,6 +488,7 @@ int Agent::negDiagWeight(Environment &gameState, const int &row, const int &colu
 
     int** board = gameState.getBoard();
 
+    // checks the board position passed in and adds to appropriate count
     if(board[row][column] == player) amtTokens++;
     else if(board[row][column] == 0) amtEmpty++;
     else 
@@ -608,7 +503,7 @@ int Agent::negDiagWeight(Environment &gameState, const int &row, const int &colu
     nj = row - 1;
     while(end < 2)
     {
-        // positive direction
+        // count in positive direction until end of board found or end of available space found
         if(ey == 0 && pi < 6 && pj < 7 && board[pi][pj] == player)
             amtTokens++;
 
@@ -618,7 +513,7 @@ int Agent::negDiagWeight(Environment &gameState, const int &row, const int &colu
         if(pi >= 6 || pj >= 7 || board[pi][pj] == (player*-1))
             ey = 1;
 
-        // negative direction
+        // count in negative direction until end of board found or end of available space found
         if(ex == 0 && ni >= 0 && nj >= 0 && board[ni][nj] == player)
             amtTokens++;
         if(ex == 0 && ni >= 0 && nj >= 0 && board[ni][nj] == 0)
@@ -632,13 +527,15 @@ int Agent::negDiagWeight(Environment &gameState, const int &row, const int &colu
         ni--;
         nj--;
     }
+    // if 4 tokens in a row, return a win!
     if(amtTokens >= 4)
         return winValue;
     
+    // count available spaces
     amtAvail = amtTokens + amtEmpty;
-    if(amtAvail < 4)
+    if(amtAvail < 4) // if not enough spaces to win, return 0
         return 0;
-    else
+    else // return weighting function
     {
         return (amtTokens*5) + (amtEmpty*2);
     }
