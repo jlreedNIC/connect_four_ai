@@ -11,4 +11,10 @@ Requirements: The program must use a minimax search algorithm (it can be coded a
 Algorithms: Your program must use, at least, minimax search. You will need to write an evaluation heuristic because searching the entire game tree is not feasible. If your minimax/negamax algorithm is working properly the program should always block a potential win by the opponent (if there are three opponent pieces in a row the computer places a piece to block the win) and always makes a winning move if one is available. Note: if there are two possible paths to a sure victory the program may take the longer one.
 
 ## Status
-In development.
+Finished. Only compiled for Linux machines.
+
+## To Run on Linux
+- Install SFML libraries.
+- Download code
+- Run 'make test' in the folder you downloaded to
+- Play
