@@ -51,8 +51,9 @@ int Agent::pickMove(int **gameBoard)
     for(int i=0; i<7; i++)
     {
         value = abMinValue(gameState, moveOrder[i], 1, beta, alpha);
-        if(value == -1) // error, don't go here
+        if(value == errorValue || value == errorValue*-1) // error, don't go here
         {
+            // std:: cout << "error placing token at root\n";
             if(bestMove < 6) bestMove++;
             bestValue = errorValue*-1;            
         }
@@ -63,6 +64,7 @@ int Agent::pickMove(int **gameBoard)
         }
     }
     // reorderMoves(bestMove); // will now check last move made first
+    std::cout << bestMove << " \n";
     return bestMove;
 }
 
@@ -129,17 +131,23 @@ int Agent::abMaxValue(Environment gameState, const int &move, const int &depth, 
     // check max of every next state = min state
     for(int i=0; i<7; i++)
     {
-        value = std::max(value, abMinValue(gameState, i, depth+1, bestMinValue, bestMaxValue));
-        if(value >= bestMinValue)
+        result = abMinValue(gameState, i, depth+1, bestMinValue, bestMaxValue);
+        if(result != errorValue*-1)
         {
-            // std::cout << " max ab value found: " << value << "\n";
-            return value;
-        }
-        else
-        {
-            bestMaxValue = std::max(value, bestMaxValue);
+            value = std::max(value, result);
+            if(value >= bestMinValue)
+            {
+                // std::cout << " max ab value found: " << value << "\n";
+                return value;
+            }
+            else
+            {
+                bestMaxValue = std::max(value, bestMaxValue);
+            }
         }
     }
+    if(result == errorValue) return errorValue;
+
     return value;
 }
 
@@ -172,19 +180,26 @@ int Agent::abMinValue(Environment gameState, const int &move, const int &depth, 
 
     value = winValue-depth;
     // checking next states
+    
     for(int i=0; i<7; i++)
     {
-        value = std::min(value, abMaxValue(gameState, i, depth+1, bestMinValue, bestMaxValue));
-        if(value <= bestMaxValue)
+        result = abMaxValue(gameState, i, depth+1, bestMinValue, bestMaxValue);
+        if(result != errorValue)
         {
-            // std::cout << " minimum ab value found: " << value << "\n";
-            return value;
-        }
-        else
-        {
-            bestMinValue = std::min(value, bestMinValue);
+            value = std::min(value, result);
+            if(value <= bestMaxValue)
+            {
+                // std::cout << " minimum ab value found: " << value << "\n";
+                return value;
+            }
+            else
+            {
+                bestMinValue = std::min(value, bestMinValue);
+            }
         }
     }
+    if(result == errorValue) return errorValue*-1;
+
     return value;
 }
 
