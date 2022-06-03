@@ -99,78 +99,6 @@ void Agent::reorderMoves(const int &value)
 }
 
 /**
- * @brief Gives the minimum value of all of the possible choices, which are all maximum nodes or
- *        a win, loss, draw, or evaluation of the state
- * 
- * @param gameState board configuration
- * @param move potential next move to make
- * @param depth current depth of search tree
- * @return int minimum of all choices
- */
-int Agent::minValue(Environment gameState, const int &move, const int &depth)
-{
-    // std::cout << "checking min node" << move << "...\n";
-    int result = gameState.placeToken(1, move);
-    if(result == -1)
-        return -1;
-
-    // win or loss
-    int value = gameState.checkForWin();
-    if(value != 0) return (winValue*value)+(value*depth);
-
-    // draw
-    if(gameState.checkForDraw()) return 0;
-
-    // leaf node
-    if(depth == maxDepth) return evaluate(gameState);
-
-    value = winValue - depth;
-    // find the minimum of the next state (which are all maximums)
-    for(int i=0; i<7; i++)
-    {
-        value = std::min(value, maxValue(gameState, i, depth+1));
-    }
-
-    return value;
-}
-
-/**
- * @brief Gives the maximum value of all of the possible choices, which are all minimum nodes or
- *        a win, loss, draw, or evaluation of the state
- * 
- * @param gameState board configuration
- * @param move potential next move to make
- * @param depth current depth of search tree
- * @return int maximum of all choices
- */
-int Agent::maxValue(Environment gameState, const int &move, const int &depth)
-{
-    // std::cout << "checking max node " << move << "...\n";
-
-    // apply move to state
-    int result = gameState.placeToken(-1, move);
-    if(result == -1)
-        return 1;
-
-    // check for loss
-    int value = gameState.checkForWin();
-    if(value != 0) return (winValue*value)+(value*depth);
-    
-    if(gameState.checkForDraw()) return 0;
-
-    // leaf node
-    if(depth == maxDepth) return evaluate(gameState);
-
-    value = -winValue + depth;
-    // check max of every next state (which are mins)
-    for(int i=0; i<7; i++)
-    {
-        value = std::max(value, minValue(gameState, i, depth+1));
-    }
-    return value;
-}
-
-/**
  * @brief Using alpha beta pruning, return the maximum of the next move options.
  * 
  * @param gameState current board configuration
@@ -259,11 +187,6 @@ int Agent::abMinValue(Environment gameState, const int &move, const int &depth, 
     }
     return value;
 }
-
-/*
-TO DO:
--check the evaluation function (specifically vertical) to make sure it's working right.
-*/
 
 /**
  * @brief Assigns a value to each node based off of the tokens in a row containing that node.
@@ -584,4 +507,3 @@ int Agent::negDiagWeight(Environment &gameState, const int &row, const int &colu
         return (amtTokens*5) + (amtEmpty*2);
     }
 }
-

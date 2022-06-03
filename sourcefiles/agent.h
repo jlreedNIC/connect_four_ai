@@ -21,7 +21,7 @@ class Agent
         Agent();
         ~Agent();
 
-        int pickMove(int **gameBoard); // instead of gameBoard, do environment or assign gameboard values to new environment
+        int pickMove(int **gameBoard);
 
     private:
         int maxDepth;
@@ -31,11 +31,7 @@ class Agent
 
         void reorderMoves(const int &value);
 
-        // helper functions for pickMove
-        int maxValue(Environment gameState, const int &move, const int &depth);
-        int minValue(Environment gameState, const int &move, const int &depth);
-
-        // TO DO: fix alpha beta pruning. try selective ordering or another method to add to it.
+        // helper functions for alpha beta pruning
         int abMaxValue(Environment gameState, const int &move, const int &depth, int bestMinValue, int bestMaxValue);
         int abMinValue(Environment gameState, const int &move, const int &depth, int bestMinValue, int bestMaxValue);
 
