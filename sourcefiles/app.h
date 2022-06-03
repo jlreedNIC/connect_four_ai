@@ -1,22 +1,21 @@
 /**
  * @file app.h
  * @author Jordan Reed (reed5204@vandals.uidaho.edu)
- * @date 05-25-22
- * @class
- * @brief 
+ * @date 06-03-22
+ * @class CS 470
+ * @brief The class declarations for the GUI portion of the connect four game.
+ *        Also contains the environment and agent variables.
  * 
  */
 
 #ifndef APP_H
 #define APP_H
 
-
-#include <iostream>
+#include <iostream> // debugging
 #include <unistd.h> // sleep function
 #include <SFML/Graphics.hpp>
 #include "environment.h"
 #include "agent.h"
-// #include <SFML/Keyboard.hpp>
 
 class App
 {
@@ -24,8 +23,8 @@ class App
         App();
         ~App();
 
-        void runApp();
         void startMenu();
+        void runApp();
 
     private:
         sf::RenderWindow window;
@@ -33,12 +32,18 @@ class App
         sf::RectangleShape boardBackground;
         sf::CircleShape boardHoles[6][7];
 
-        // sf::Font basicFont;
-        // sf::Text basicText;
+        sf::Font basicFont;                 // font for text
+        sf::Text instructions;              // text to display at the beginning and end of game
+        sf::Text compChoice, playerChoice;  // text to display for who starts, TO DO: maybe put into array?
+        sf::CircleShape startCursor;        // cursor to use at the beginning of game
+        sf::RectangleShape background;      // background popup for the end of the game
 
-        void drawGameBoard();
-        void exitScreen();
-        // void drawCursor(const int &direction=-1);
+        void setText(); // initialize text for start screen
+        void drawStartMenu(); // draw the start menu
+
+        void drawGameBoard(); // draw game board
+        void exitScreen(); 
+
         void moveCursor(const sf::Keyboard::Key &direction=sf::Keyboard::Unknown);
         void updateGameBoard();
         void updateCursor();

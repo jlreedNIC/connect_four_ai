@@ -1,9 +1,9 @@
 /**
  * @file app.cpp
  * @author Jordan Reed (reed5204@vandals.uidaho.edu)
- * @date 05-25-22
- * @class
- * @brief 
+ * @date 06-03-22
+ * @class CS 470
+ * @brief Definition file for the app class. 
  * 
  */
 
@@ -30,11 +30,18 @@ App::App() : window(sf::VideoMode(600,600), "Connect Four AI Test"), gameBoard()
     cursor.setRotation(180.f);
     cursor.setPosition(sf::Vector2f(325.f, 60.f));
 
+    // TO DO: reuse cursor
+    startCursor.setPointCount(3);
+    startCursor.setRadius(25.f);
+    startCursor.setFillColor(sf::Color::Black);
+    startCursor.setRotation(90.f);
+    startCursor.setPosition(sf::Vector2f(325.f, 60.f));
+
     // initialize board background
     boardBackground.setFillColor(sf::Color::Blue);
     // set position of rectangle to middle of window
     sf::Vector2u size = window.getSize();
-    unsigned int width = size.x;
+    unsigned int width = size.x; // TO DO: this is not needed
     unsigned int height = size.y;
 
     float rectWidth = width - 100;
@@ -43,6 +50,14 @@ App::App() : window(sf::VideoMode(600,600), "Connect Four AI Test"), gameBoard()
     
     boardBackground.setOrigin(sf::Vector2f(rectWidth/2, rectHeight/2));
     boardBackground.setPosition(sf::Vector2f(width/2, (height/10)* 5.5));
+
+    // background for exit screen
+    background.setFillColor(sf::Color::White);
+    background.setOutlineColor(sf::Color::Black);
+    background.setOutlineThickness(3);
+    background.setSize(sf::Vector2f(size.x - 200, size.y - 400));
+    background.setOrigin(sf::Vector2f((size.x-200)/2, (size.y-400)/2));
+    background.setPosition(sf::Vector2f(size.x/2, size.y/2));
 
     // initialize board holes
     for(int i=0; i<6; i++)
@@ -55,6 +70,44 @@ App::App() : window(sf::VideoMode(600,600), "Connect Four AI Test"), gameBoard()
         }
     }
     
+    if(!basicFont.loadFromFile("sourcefiles/fonts/Roboto-Thin.ttf"))
+    {
+        std::cout << "error loading font\n";
+    }
+
+    setText();
+    
+}
+
+/**
+ * @brief Initializes the text and starting cursor for use in the start menu.
+ * 
+ */
+void App::setText()
+{
+    sf::Vector2f position(180.f, 100.f);
+
+    startCursor.setPosition(sf::Vector2f(200.f, 170.f));
+
+    instructions.setFont(basicFont);
+    instructions.setFillColor(sf::Color::Black);
+    instructions.setCharacterSize(36);
+    instructions.setString("Who will go first?");
+    instructions.setPosition(position);
+
+    compChoice.setFont(basicFont);
+    compChoice.setFillColor(sf::Color::Black);
+    compChoice.setCharacterSize(36);
+    compChoice.setString("Computer");
+    position += sf::Vector2f(40.f, 70.f);
+    compChoice.setPosition(position);
+
+    playerChoice.setFont(basicFont);
+    playerChoice.setFillColor(sf::Color::Black);
+    playerChoice.setCharacterSize(36);
+    playerChoice.setString("Player");
+    position += sf::Vector2f(0.0f, 50.f);
+    playerChoice.setPosition(position);
 }
 
 /**
@@ -73,31 +126,59 @@ App::~App()
  */
 void App::startMenu()
 {
-    // while(window.isOpen())
-    // {
-    //     sf::Event event;
+    // TO DO: change from cout to cerr
+    while(window.isOpen())
+    {
+        sf::Event event;
 
-    //     while(window.pollEvent(event))
-    //     {
-    //         if(event.type == sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-    //         {
-    //             std::cout << "Mouse button pushed\n";
-    //         }
-    //     }
+        while(window.pollEvent(event))
+        {
+            if(event.type == sf::Event::Closed)
+            {
+                std::cout << "closing window\n";
+                window.close();
+            }
+            if(event.type == sf::Event::KeyPressed)
+            {
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && startCursor.getPosition().y == 170.f) // && startCursor.getPosition()...
+                {
+                    startCursor.move(sf::Vector2f(0.0f, 50.f));
+                }
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && startCursor.getPosition().y == 220.f) // && startCursor.getPosition()...
+                {
+                    startCursor.move(sf::Vector2f(0.0f, -50.f));
+                }
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) // && startCursor.getPosition()...
+                {
+                    std::cout << "checking position of cursor to set who starts\n";
+                    if(startCursor.getPosition().y == 170.f) whoStarts = 1;
+                    else whoStarts = -1;
+                    return;
+                }
+            }
+        }
 
-    //     drawStartMenu();
-    // }
+        // draw window
+        window.clear(sf::Color::White);
+        drawStartMenu();
+        window.display();
+    }
 }
 
-// void App::drawStartMenu()
-// {
-//     sf::RectangleShape playerFirst(sf::Vector2f(50.f, 30.f));
-//     playerFirst.setFillColor(sf::Color::White);
-//     playerFirst.setOutlineColor(sf::Color::Black);
-// }
+/**
+ * @brief Draws the objects needed for the start menu.
+ * 
+ */
+void App::drawStartMenu()
+{
+    window.draw(instructions);
+    window.draw(compChoice);
+    window.draw(playerChoice);
+    window.draw(startCursor);
+}
 
 /**
- * @brief Main game loop.
+ * @brief Main game loop. Responsible for changing turns.
  * 
  */
 void App::runApp()
@@ -171,6 +252,10 @@ void App::runApp()
         {
             // function for displaying winner
             std::cout << "we have a winner! " << winner << "\n";
+            if(winner == 1) instructions.setString("You lost. Try again another time.");
+            else if(winner == -1) instructions.setString("You won! Good game.");
+            else instructions.setString("It was a tie. Let's play again another time.");
+            sleep(1);
             exitScreen();
         }
         
@@ -200,6 +285,10 @@ void App::drawGameBoard()
  */
 void App::exitScreen()
 {
+    sf::Vector2f backgroundPos = background.getPosition();
+    instructions.setPosition(sf::Vector2f(backgroundPos.x-150.f, backgroundPos.y));
+    instructions.setStyle(sf::Text::Bold);
+    instructions.setCharacterSize(24);
     std::cout << "Thanks for playing!\n";
     while(window.isOpen())
     {
@@ -211,6 +300,12 @@ void App::exitScreen()
                 window.close();
             }
         }
+
+        window.clear(sf::Color::White);
+        drawGameBoard();
+        window.draw(background);
+        window.draw(instructions);
+        window.display();
     }
 }
 
@@ -234,10 +329,7 @@ void App::moveCursor(const sf::Keyboard::Key &direction)
         moveVector.x += 70.f;
         position++;
     }
-    cursor.move(moveVector);
-
-    std::cout << "cursor over " << position << "\n";
-    
+    cursor.move(moveVector);    
 }
 
 /**
