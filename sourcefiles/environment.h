@@ -1,3 +1,13 @@
+/**
+ * @file environment.h
+ * @author Jordan Reed (jlreed@students.nic.edu)
+ * @date 06-03-22
+ * @class CS 470
+ * @brief Declaration file for the environment. This contains the gameboard
+ *        and the relevant functions to act on the gameboard.
+ * 
+ */
+
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
 
@@ -11,7 +21,7 @@ class Environment
         Environment(const Environment &gameState);
         ~Environment();
 
-        void operator= (const Environment &that);
+        void operator= (const Environment &that); // pretty sure this is not needed
 
         int** getBoard();   // is this function needed?
         // think about printing gameboard instead, or returning string with values

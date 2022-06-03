@@ -1,3 +1,12 @@
+/**
+ * @file environment.cpp
+ * @author Jordan Reed (jlreed@students.nic.edu)
+ * @date 06-03-22
+ * @class CS 470
+ * @brief Definition file for the environment class.
+ * 
+ */
+
 #include "environment.h"
 
 /**

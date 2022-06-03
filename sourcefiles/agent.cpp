@@ -1,3 +1,12 @@
+/**
+ * @file agent.cpp
+ * @author Jordan Reed (reed5204@vandals.uidaho.edu)
+ * @date 06-03-22
+ * @class CS 470
+ * @brief Definition file for agent class.
+ * 
+ */
+
 #include "agent.h"
 
 /**
@@ -6,9 +15,9 @@
  */
 Agent::Agent()
 {
-    maxDepth = 5; 
+    maxDepth = 6; 
     winValue = 10000;
-    errorValue = winValue*10;
+    errorValue = winValue*winValue;
     // std::cout << "Agent created\n";
 }
 
@@ -220,6 +229,11 @@ int Agent::abMinValue(Environment gameState, const int &move, const int &depth, 
     }
     return value;
 }
+
+/*
+TO DO:
+-check the evaluation function (specifically vertical) to make sure it's working right.
+*/
 
 /**
  * @brief Assigns a value to each node based off of the tokens in a row containing that node.
