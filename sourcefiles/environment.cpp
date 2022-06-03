@@ -27,6 +27,11 @@ Environment::Environment()
 
 }
 
+/**
+ * @brief Construct a new Environment out of a given array
+ * 
+ * @param otherGameBoard dynamic array to copy
+ */
 Environment::Environment(int** otherGameBoard)
 {
     board = new int*[6];
@@ -40,6 +45,11 @@ Environment::Environment(int** otherGameBoard)
     // std::cout << "other constructor called\n";
 }
 
+/**
+ * @brief copy constructor
+ * 
+ * @param gameState environment object to copy
+ */
 Environment::Environment(const Environment &gameState)
 {
     // something about copy constructor not being called in -std=c++17
@@ -52,15 +62,6 @@ Environment::Environment(const Environment &gameState)
             board[i][j] = gameState.board[i][j];
     
     // std::cout << "copy constructor called\n";
-}
-
-void Environment::operator= (const Environment &that)
-{
-    for(int i=0; i<6; i++)
-        for(int j=0; j<7; j++)
-            board[i][j] = that.board[i][j];
-    
-    // std::cout << "assignment operator\n";
 }
 
 /**
@@ -136,6 +137,11 @@ bool Environment::checkForDraw() // rename checkEmptyBoard?
     return true;
 }
 
+/**
+ * @brief Checks the board for a winning configuration for either the player or the computer
+ * 
+ * @return int 1 if the computer won, -1 if the player won, or 0 if neither
+ */
 int Environment::checkForWin()
 {
     int win = checkForWin(1);
@@ -325,4 +331,3 @@ int Environment::diagWinCheck(const int &player, const int &i, const int &j)
         return 0;
     else return player;
 }
-

@@ -21,11 +21,7 @@ class Environment
         Environment(const Environment &gameState);
         ~Environment();
 
-        void operator= (const Environment &that); // pretty sure this is not needed
-
-        int** getBoard();   // is this function needed?
-        // think about printing gameboard instead, or returning string with values
-        // or maybe return board[i][j] just for gui sake?
+        int** getBoard();
 
         int checkForWin();
         int checkForWin(const int &player);
@@ -34,7 +30,7 @@ class Environment
 
     private:
         int **board; // board made up of 1's (computer), 0's (empty), and -1's (opponent)
-                         // 6 rows, 7 columns
+                     // 6 rows, 7 columns
         
         int horizWinCheck(const int &player, const int &i, const int &j);
         int vertWinCheck(const int &player, const int &i, const int &j);
