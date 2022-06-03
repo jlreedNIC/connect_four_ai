@@ -27,6 +27,9 @@ class Agent
         int maxDepth;
         int winValue;
         int errorValue;
+        int moveOrder[7];
+
+        void reorderMoves(const int &value);
 
         // helper functions for pickMove
         int maxValue(Environment gameState, const int &move, const int &depth);

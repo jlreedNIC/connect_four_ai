@@ -18,6 +18,11 @@ Agent::Agent()
     maxDepth = 7; 
     winValue = 10000;
     errorValue = winValue*winValue;
+
+    for(int i=0; i<7; i++)
+    {
+        moveOrder[i] = i;
+    }
     // std::cout << "Agent created\n";
 }
 
@@ -41,10 +46,9 @@ int Agent::pickMove(int **gameBoard)
     int bestMove = 0;
     // maxDepth++; // maybe implement with alphabeta pruning
 
-    int orderCheck[7] = {3,0,1,2,4,5,6};
     int alpha = -winValue, beta = winValue;
     // find max of every child (which is min node)
-    for(int i=3; i<7; i++)
+    for(int i=0; i<7; i++)
     {
         value = abMinValue(gameState, i, 1, beta, alpha);
         if(value == -1) // error, don't go here
@@ -55,46 +59,43 @@ int Agent::pickMove(int **gameBoard)
         else if(value > bestValue) // finding max of min nodes
         {
             bestValue = value;
-            bestMove = i;
+            bestMove = moveOrder[i];
         }
     }
-    for(int i=2; i>=0; i--)
-    {
-        value = abMinValue(gameState, i, 1, beta, alpha);
-        if(value == -1) // error, don't go here
-        {
-            if(bestMove < 6) bestMove++;
-            bestValue = errorValue*-1;            
-        }
-        else if(value > bestValue) // finding max of min nodes
-        {
-            bestValue = value;
-            bestMove = i;
-        }
-    }
-    // for(int i=0; i<7; i++)
-    // {
-    //     // std::cout << "\nstarting minmax search for max node " << i << "\n";
-    //     value = abMinValue(gameState, i, 1, beta, alpha);
-    //     // value = minValue(gameState, i, 1);
-    //     if(value == -1) // error, don't go here (might be causing error with alphabeta)
-    //     {
-    //         // std::cout << "not this root node\n";
-    //         if(bestMove < 6) bestMove++;
-    //         bestValue = errorValue*-1;
-    //         // std::cout << "bestval: " << bestValue << " bestmove: " << bestMove << "\n";
-            
-    //     }
-    //     else if(value > bestValue) // finding max of min nodes
-    //     {
-    //         bestValue = value;
-    //         bestMove = i;
-    //         // std::cout << "best move found " << bestMove << " " << i << "\n";
-    //     }
-    //     // std::cout << "value: " << value << " best value: " << bestValue << " bestMove: " << bestMove << "\n";
-    // }
-    // std::cout << "best move: " << bestMove << "\n";
+    reorderMoves(bestMove); // will now check last move made first
     return bestMove;
+}
+
+/**
+ * @brief Puts the given value at the start of the move array, and moves 
+ *        the other values up one. Makes the assumption that the value IS in the array.
+ * 
+ * @param value int from 0 - 6
+ */
+void Agent::reorderMoves(const int &value)
+{
+    int tempIndex = 0, tempVal = 0, swapVal = 0;
+
+    // find index of value
+    for(int i=0; i<7; i++)
+    {
+        if(moveOrder[i] == value)
+        {
+            tempIndex = i;
+            break;
+        }
+    }
+
+    // put value in first slot and move everything else up
+    swapVal = moveOrder[0];
+    moveOrder[0] = moveOrder[tempIndex];
+
+    for(int i=1; i<=tempIndex; i++)
+    {
+        tempVal = moveOrder[i];
+        moveOrder[i] = swapVal;
+        swapVal = tempVal;
+    }
 }
 
 /**
