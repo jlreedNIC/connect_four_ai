@@ -33,8 +33,8 @@ class Agent
         int minValue(Environment gameState, const int &move, const int &depth);
 
         // TO DO: fix alpha beta pruning. try selective ordering or another method to add to it.
-        int abMaxValue(Environment gameState, const int &move, const int &depth, int &bestMinValue, int &bestMaxValue);
-        int abMinValue(Environment gameState, const int &move, const int &depth, int &bestMinValue, int &bestMaxValue);
+        int abMaxValue(Environment gameState, const int &move, const int &depth, int bestMinValue, int bestMaxValue);
+        int abMinValue(Environment gameState, const int &move, const int &depth, int bestMinValue, int bestMaxValue);
 
         int evaluate(Environment &gameState);
         int horizWeight(Environment &gameState, const int &row, const int &column, const int &player);

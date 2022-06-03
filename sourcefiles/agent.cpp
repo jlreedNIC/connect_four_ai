@@ -15,7 +15,7 @@
  */
 Agent::Agent()
 {
-    maxDepth = 6; 
+    maxDepth = 7; 
     winValue = 10000;
     errorValue = winValue*winValue;
     // std::cout << "Agent created\n";
@@ -41,29 +41,58 @@ int Agent::pickMove(int **gameBoard)
     int bestMove = 0;
     // maxDepth++; // maybe implement with alphabeta pruning
 
+    int orderCheck[7] = {3,0,1,2,4,5,6};
     int alpha = -winValue, beta = winValue;
     // find max of every child (which is min node)
-    for(int i=0; i<7; i++)
+    for(int i=3; i<7; i++)
     {
-        // std::cout << "\nstarting minmax search for max node " << i << "\n";
-        // value = abMinValue(gameState, i, 1, beta, alpha);
-        value = minValue(gameState, i, 1);
-        if(value == -1) // error, don't go here (might be causing error with alphabeta)
+        value = abMinValue(gameState, i, 1, beta, alpha);
+        if(value == -1) // error, don't go here
         {
-            // std::cout << "not this root node\n";
             if(bestMove < 6) bestMove++;
-            bestValue = errorValue*-1;
-            // std::cout << "bestval: " << bestValue << " bestmove: " << bestMove << "\n";
-            
+            bestValue = errorValue*-1;            
         }
         else if(value > bestValue) // finding max of min nodes
         {
             bestValue = value;
             bestMove = i;
-            // std::cout << "best move found " << bestMove << " " << i << "\n";
         }
-        // std::cout << "value: " << value << " best value: " << bestValue << " bestMove: " << bestMove << "\n";
     }
+    for(int i=2; i>=0; i--)
+    {
+        value = abMinValue(gameState, i, 1, beta, alpha);
+        if(value == -1) // error, don't go here
+        {
+            if(bestMove < 6) bestMove++;
+            bestValue = errorValue*-1;            
+        }
+        else if(value > bestValue) // finding max of min nodes
+        {
+            bestValue = value;
+            bestMove = i;
+        }
+    }
+    // for(int i=0; i<7; i++)
+    // {
+    //     // std::cout << "\nstarting minmax search for max node " << i << "\n";
+    //     value = abMinValue(gameState, i, 1, beta, alpha);
+    //     // value = minValue(gameState, i, 1);
+    //     if(value == -1) // error, don't go here (might be causing error with alphabeta)
+    //     {
+    //         // std::cout << "not this root node\n";
+    //         if(bestMove < 6) bestMove++;
+    //         bestValue = errorValue*-1;
+    //         // std::cout << "bestval: " << bestValue << " bestmove: " << bestMove << "\n";
+            
+    //     }
+    //     else if(value > bestValue) // finding max of min nodes
+    //     {
+    //         bestValue = value;
+    //         bestMove = i;
+    //         // std::cout << "best move found " << bestMove << " " << i << "\n";
+    //     }
+    //     // std::cout << "value: " << value << " best value: " << bestValue << " bestMove: " << bestMove << "\n";
+    // }
     // std::cout << "best move: " << bestMove << "\n";
     return bestMove;
 }
@@ -150,7 +179,7 @@ int Agent::maxValue(Environment gameState, const int &move, const int &depth)
  * @param bestMaxValue also known as alpha, the current best value of the max tree
  * @return int maximum value of all choices
  */
-int Agent::abMaxValue(Environment gameState, const int &move, const int &depth, int &bestMinValue, int &bestMaxValue)
+int Agent::abMaxValue(Environment gameState, const int &move, const int &depth, int bestMinValue, int bestMaxValue)
 {
     // apply move to state
     int result = gameState.placeToken(-1, move);
@@ -195,7 +224,7 @@ int Agent::abMaxValue(Environment gameState, const int &move, const int &depth, 
  * @param bestMaxValue also known as alpha, the current best value of the max tree
  * @return int minimum value of all choices
  */
-int Agent::abMinValue(Environment gameState, const int &move, const int &depth, int &bestMinValue, int &bestMaxValue)
+int Agent::abMinValue(Environment gameState, const int &move, const int &depth, int bestMinValue, int bestMaxValue)
 {
     // std::cout << "checking abmin node" << move << "...\n";
     int result = gameState.placeToken(1, move);
