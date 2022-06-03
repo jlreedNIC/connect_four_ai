@@ -34,12 +34,9 @@ class App
 
         sf::Font basicFont;                 // font for text
         sf::Text instructions;              // text to display at the beginning and end of game
-        sf::Text compChoice, playerChoice;  // text to display for who starts, TO DO: maybe put into array?
-        sf::CircleShape startCursor;        // cursor to use at the beginning of game
         sf::RectangleShape background;      // background popup for the end of the game
 
         void setText(); // initialize text for start screen
-        void drawStartMenu(); // draw the start menu
 
         void drawGameBoard(); // draw game board
         void exitScreen(); 
