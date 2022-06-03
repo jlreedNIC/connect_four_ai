@@ -191,6 +191,9 @@ void App::runApp()
                             {
                                 whoStarts = 1;
                                 std::cout << "placing token\n";
+                                if(position < 6) agent.reorderMoves(position+1);
+                                if(position > 0) agent.reorderMoves(position-1);
+                                agent.reorderMoves(position);
                             }
                         }
                         break;

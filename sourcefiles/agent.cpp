@@ -50,7 +50,7 @@ int Agent::pickMove(int **gameBoard)
     // find max of every child (which is min node)
     for(int i=0; i<7; i++)
     {
-        value = abMinValue(gameState, i, 1, beta, alpha);
+        value = abMinValue(gameState, moveOrder[i], 1, beta, alpha);
         if(value == -1) // error, don't go here
         {
             if(bestMove < 6) bestMove++;
@@ -62,7 +62,7 @@ int Agent::pickMove(int **gameBoard)
             bestMove = moveOrder[i];
         }
     }
-    reorderMoves(bestMove); // will now check last move made first
+    // reorderMoves(bestMove); // will now check last move made first
     return bestMove;
 }
 

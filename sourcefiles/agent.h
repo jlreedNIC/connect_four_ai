@@ -22,14 +22,13 @@ class Agent
         ~Agent();
 
         int pickMove(int **gameBoard);
+        void reorderMoves(const int &value);
 
     private:
         int maxDepth;
         int winValue;
         int errorValue;
         int moveOrder[7];
-
-        void reorderMoves(const int &value);
 
         // helper functions for alpha beta pruning
         int abMaxValue(Environment gameState, const int &move, const int &depth, int bestMinValue, int bestMaxValue);
